@@ -21,6 +21,7 @@ int MoveToFrontList::cnt = 0;
 
 int main(int argc, const char * argv[]) {
     // insert code here...
+	setlocale(LC_ALL, "Russian");
     srand(time(NULL));
     
     
@@ -51,21 +52,19 @@ int main(int argc, const char * argv[]) {
     //std::cout << mtf->bookStack.size() << std::endl;
         time_t now;
         time(&now);
-//        for (int i = 0; i < 1; i++) {
-//            auto tmp = new boost::dynamic_bitset<>(wSize, rand());
-//            mtf->process(tmp);
-//        }
+        for (int i = 0; i < 1; i++) {
+            auto tmp = new boost::dynamic_bitset<>(wSize, rand()%8);
+            mtf->process(tmp);
+        }
         time_t end;
         time(&end);
     //std::cout << end - now << std::endl;
     
-    for (auto it = mtf->hashSet.begin(); it != mtf->hashSet.end(); ++it) {
-        mtf->bookStack.erase(*it);
-    }
+    //for (auto it = mtf->hashSet.begin(); it != mtf->hashSet.end(); ++it) {
+    //    mtf->bookStack.erase(*it);
+    //}
 
-    std::cout << "ahhahaa" << std::endl;
-    mtf->out();
-    
+	getchar();
     
     return 0;
 }

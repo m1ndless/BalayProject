@@ -12,6 +12,7 @@
 #include <unordered_set>
 #include <boost/dynamic_bitset.hpp>
 #include <boost/functional/hash.hpp>
+
 #include <functional>
 #include <iostream>
 #include <list>
@@ -78,6 +79,14 @@ namespace hashUtils {
             return boost::hash_value(*it->key.get());
         }
     };
+
+	struct IteratorEqual
+	{
+		bool operator()(const std::list<Key>::iterator &lhs, const std::list<Key>::iterator &rhs) {
+			//std::cout << *(*lhs).key.get() << "\t" << *(*rhs).key.get();
+			return *(*lhs).key.get() == *(*rhs).key.get();
+		}
+	};
     
 }
 
@@ -91,7 +100,7 @@ public:
     std::list<Key>::iterator it;
     
     std::list<Key> bookStack;
-    std::unordered_set<std::list<Key>::iterator, hashUtils::IteratorHash> hashSet;
+    std::unordered_set<std::list<Key>::iterator, hashUtils::IteratorHash, hashUtils::IteratorEqual> hashSet;
     int topPartCount;
     
     MoveToFrontList(size_t _wLength, int _exponent) : wLength(_wLength), exponent(_exponent) {
@@ -104,14 +113,14 @@ public:
         for (int i = 0; i < pow(2, this->exponent); i++) {
             Key tmp(new boost::dynamic_bitset<>(this->wLength, i));
             bookStack.push_back(tmp);
-        }
-        bookStack.push_back(Key(new boost::dynamic_bitset<>(this->wLength, pow(2, this->exponent))));
-        bookStack.insert(<#const_iterator __p#>, <#initializer_list<value_type> __il#>)
+        }  
         it = bookStack.begin();
+		auto t = hashSet.hash_function();
         for (;it != bookStack.end(); ++it) {
             hashSet.insert(it);
         }
-        
+		bookStack.push_back(Key(new boost::dynamic_bitset<>(this->wLength, pow(2, this->exponent))));
+		it = --bookStack.end();
     }
     
     void out() {
@@ -123,7 +132,8 @@ public:
     void outHashSet() {
         for (auto it = hashSet.begin(); it != hashSet.end(); ++it) {
             std::cout << *(*it)->key.get() << std::endl;
-        }    }
+        }    
+	}
             
 
     
@@ -131,14 +141,26 @@ public:
     Key findPosition(boost::dynamic_bitset<> *el) {
         //auto elem = new Element(el);
         Key elem(el);
-        //hashSet.fi
-        auto res = hashSet.find(&elem);
-//        if (res != hashSet.end()) {
-//            topPartCount++;
-//            return res->key;
-//        }
-//        else return nullptr;
-        
+		*it = elem;
+		auto t = hashSet.hash_function();
+		auto m = hashSet.key_eq();
+
+		for (auto iter = hashSet.begin(); iter != hashSet.end(); ++iter) {
+			std::cout << t(*iter) << "\t" << t(it) << "\t" << m(*iter, it) << std::endl;
+		}
+
+
+		auto res = hashSet.find(it);
+		//std::cout << "RESULT IS: " << (*res)->key.get() << std::endl;
+        if (res != hashSet.end()) {
+			std::cout << "zaebis" << std::endl;
+            topPartCount++;
+			return (*res)->key;
+        }
+		else {
+			std::cout << "huevo" << std::endl;
+			return nullptr;
+		}
         
         
         
@@ -167,18 +189,18 @@ public:
     
     void process(boost::dynamic_bitset<> *bs) {
         //int cnt = 0;
-        std::cout << "Ищем слово " << *bs << std::endl;
-        //std::cout <<  "Текущая стопка: " << std::endl;
-        //out();
+        std::cout << "Looking for a word " << *bs << std::endl;
+        std::cout <<  "Current stack is: " << std::endl;
+        out();
         
-        //auto t = hashSet.hash_function();
-        //std::cout << "Хэш искомого слова: " << t(bs) << std::endl;
+        auto t = hashSet.hash_function();
+        //std::cout << "HASH IS: " << t(bs) << std::endl;
         
 //        for (auto it = bookStack.begin(); it != bookStack.end(); ++it) {
 //            std::cout << t(it->key) << std::endl;// << t(std::shared_ptr<Element>(new Element(bs, 0))) << std::endl;
 //        }
         
-        //std::cout << (findPosition(bs).key.get()) << std::endl;
+        std::cout << (findPosition(bs).key.get()) << std::endl;
         //std::cout << "Позиция искомого в дэке слова: " << pos << " найдено " << ++cnt << std::endl;
         //std::cout << "Перехуячиваем позиции" << std::endl;
         //resetDequePositions(pos);
