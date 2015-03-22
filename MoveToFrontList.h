@@ -115,7 +115,7 @@ public:
             bookStack.push_back(tmp);
         }  
         it = bookStack.begin();
-		auto t = hashSet.hash_function();
+		//auto t = hashSet.hash_function();
         for (;it != bookStack.end(); ++it) {
             hashSet.insert(it);
         }
@@ -130,6 +130,7 @@ public:
     }
             
     void outHashSet() {
+        //auto t = hashSet.hash_function();
         for (auto it = hashSet.begin(); it != hashSet.end(); ++it) {
             std::cout << *(*it)->key.get() << std::endl;
         }    
@@ -138,75 +139,65 @@ public:
 
     
     //Найди заданный элемент и вернуть его позицию в дэке
-    Key findPosition(boost::dynamic_bitset<> *el) {
-        //auto elem = new Element(el);
-        Key elem(el);
-		*it = elem;
-		auto t = hashSet.hash_function();
-		auto m = hashSet.key_eq();
-
-		for (auto iter = hashSet.begin(); iter != hashSet.end(); ++iter) {
-			std::cout << t(*iter) << "\t" << t(it) << "\t" << m(*iter, it) << std::endl;
-		}
-
-
+    std::list<Key>::iterator findPosition(boost::dynamic_bitset<> *el) {
+        //Key elem(el);
+		//*it = elem;
+        
+        *it = Key(el);
+        
+        auto t = hashSet.hash_function();
+        auto m = hashSet.key_eq();
+        
+//        for (auto iter = hashSet.begin(); iter != hashSet.end(); ++iter) {
+//            std::cout << t(*iter) << "\t" << t(it) << std::endl;
+//        }
+        
+        
 		auto res = hashSet.find(it);
-		//std::cout << "RESULT IS: " << (*res)->key.get() << std::endl;
+            //std::cout << "word is: "<< *(*res)->key.get() << std::endl;
         if (res != hashSet.end()) {
-			std::cout << "zaebis" << std::endl;
+			//std::cout << "zaebis" << std::endl;
             topPartCount++;
-			return (*res)->key;
+            //std::cout << "word is: "<< *(*res)->key.get() << std::endl;
+			return *res;
         }
 		else {
-			std::cout << "huevo" << std::endl;
-			return nullptr;
+			//std::cout << "huevo" << std::endl;
+			return *hashSet.end();
 		}
-        
-        
-        
-        return nullptr;
+
     }
     
-    void resetDequePositions(int position) {
-        //Если нашли в верхней части стопки, то переписываем индексы выше
-//        if (position != -1) {
-//            for (auto it = bookStack.begin(); it < bookStack.begin() + position; ++it) {
-//                (*it).key->dequePosition++;
-//            }
-//            bookStack.erase(bookStack.begin() + position);
-//            return;
-//        }
-//        //Не нашли - вставляем в вершину стопки и сжигаем нахуй нижную книгу (Коран)
-//        else if (position == -1) {
-//            bookStack.erase(bookStack.begin() + bookStack.size() - 1);
-//            for (auto it = bookStack.begin(); it < bookStack.end(); ++it) {
-//                (*it).key->dequePosition++;
-//            }
-//            return;
-//        }
-//        return;
+        void resetDequePositions(std::list<Key>::iterator& it) {
+        //Если нашли в верхней части стопки, то удоляем
+        if (it != bookStack.end()) {
+            hashSet.erase(it);
+            bookStack.erase(it);
+            return;
+        }
+        //Не нашли - вставляем в вершину стопки и удоляем _почти_самый_нижний_
+        else if (it == bookStack.end()) {
+            // )))))))))))))
+            auto pizdec = bookStack.erase(----bookStack.end());
+            return;
+        }
     }
     
     void process(boost::dynamic_bitset<> *bs) {
         //int cnt = 0;
-        std::cout << "Looking for a word " << *bs << std::endl;
-        std::cout <<  "Current stack is: " << std::endl;
-        out();
+        //std::cout << "Looking for a word " << *bs << std::endl;
+        //std::cout <<  "Current stack is: " << std::endl;
+        //out();
+
         
-        auto t = hashSet.hash_function();
-        //std::cout << "HASH IS: " << t(bs) << std::endl;
-        
-//        for (auto it = bookStack.begin(); it != bookStack.end(); ++it) {
-//            std::cout << t(it->key) << std::endl;// << t(std::shared_ptr<Element>(new Element(bs, 0))) << std::endl;
-//        }
-        
-        std::cout << (findPosition(bs).key.get()) << std::endl;
+        auto pos = findPosition(bs);
         //std::cout << "Позиция искомого в дэке слова: " << pos << " найдено " << ++cnt << std::endl;
         //std::cout << "Перехуячиваем позиции" << std::endl;
-        //resetDequePositions(pos);
+        resetDequePositions(pos);
         //out();
         //std::cout << "Встовляем" << std::endl;
-        //bookStack.push_front(std::shared_ptr<Element>(new Element(bs, 0)));
+        bookStack.push_front(new boost::dynamic_bitset<>(*bs));
+        hashSet.insert(bookStack.begin());
         //out();
         
 #ifndef DEBUG

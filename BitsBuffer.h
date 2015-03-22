@@ -40,7 +40,7 @@ private:
         int z;
         for (z = (int)pow(2, len - 1); z > 0; z >>= 1)
         {
-            strcat_s(b, ((x & z) == z) ? "1" : "0");
+            strcat(b, ((x & z) == z) ? "1" : "0");
         }
         
         return b;
@@ -73,7 +73,7 @@ public:
         }
         
         else {
-            bytesCount = wordsize / CHAR_BIT;
+            bytesCount = (int)wordsize / CHAR_BIT;
             for (int i = currentbyte; i < currentbyte + bytesCount; i++) {
                 result.append(byte_to_binary(buf[i], CHAR_BIT));
             }

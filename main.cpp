@@ -45,26 +45,26 @@ int main(int argc, const char * argv[]) {
 //    }
     
 //    chi->out();
-    int wSize = 3;
+    int wSize = 24;
+    int exp = 24;
     
-    auto mtf = new MoveToFrontList(wSize, 3);
+    auto mtf = new MoveToFrontList(wSize, exp);
     //mtf->out();
     //std::cout << mtf->bookStack.size() << std::endl;
         time_t now;
         time(&now);
-        for (int i = 0; i < 1; i++) {
-            auto tmp = new boost::dynamic_bitset<>(wSize, rand()%8);
+        for (int i = 0; i < 10000000; i++) {
+            //std::cout << "iteration #" << i << std::endl;
+            auto tmp = new boost::dynamic_bitset<>(wSize, rand()%(int)pow(2, 24));
             mtf->process(tmp);
         }
         time_t end;
         time(&end);
-    //std::cout << end - now << std::endl;
+    std::cout << end - now << std::endl;
     
     //for (auto it = mtf->hashSet.begin(); it != mtf->hashSet.end(); ++it) {
     //    mtf->bookStack.erase(*it);
     //}
-
-	getchar();
     
     return 0;
 }
