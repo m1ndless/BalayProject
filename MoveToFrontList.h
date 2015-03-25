@@ -83,7 +83,6 @@ namespace hashUtils {
 	struct IteratorEqual
 	{
 		bool operator()(const std::list<Key>::iterator &lhs, const std::list<Key>::iterator &rhs) {
-			//std::cout << *(*lhs).key.get() << "\t" << *(*rhs).key.get();
 			return *(*lhs).key.get() == *(*rhs).key.get();
 		}
 	};
@@ -115,7 +114,6 @@ public:
             bookStack.push_back(tmp);
         }  
         it = bookStack.begin();
-		//auto t = hashSet.hash_function();
         for (;it != bookStack.end(); ++it) {
             hashSet.insert(it);
         }
@@ -125,14 +123,14 @@ public:
     
     void out() {
         for (auto it = bookStack.begin(); it != bookStack.end(); ++it) {
-            std::cout << *(it->key.get()) << std::endl;
+            std::cout << (it->key.get()) << std::endl;
             }
     }
             
     void outHashSet() {
         //auto t = hashSet.hash_function();
         for (auto it = hashSet.begin(); it != hashSet.end(); ++it) {
-            std::cout << *(*it)->key.get() << std::endl;
+            std::cout << (*it)->key.get() << std::endl;
         }    
 	}
             
@@ -148,11 +146,6 @@ public:
         auto t = hashSet.hash_function();
         auto m = hashSet.key_eq();
         
-//        for (auto iter = hashSet.begin(); iter != hashSet.end(); ++iter) {
-//            std::cout << t(*iter) << "\t" << t(it) << std::endl;
-//        }
-        
-        
 		auto res = hashSet.find(it);
             //std::cout << "word is: "<< *(*res)->key.get() << std::endl;
         if (res != hashSet.end()) {
@@ -163,41 +156,43 @@ public:
         }
 		else {
 			//std::cout << "huevo" << std::endl;
-			return *hashSet.end();
+			return bookStack.end();
 		}
 
     }
     
-        void resetDequePositions(std::list<Key>::iterator& it) {
-        //Если нашли в верхней части стопки, то удоляем
+    void resetDequePositions(std::list<Key>::iterator& it) {
         if (it != bookStack.end()) {
             hashSet.erase(it);
             bookStack.erase(it);
             return;
         }
-        //Не нашли - вставляем в вершину стопки и удоляем _почти_самый_нижний_
-        else if (it == bookStack.end()) {
-            // )))))))))))))
-            auto pizdec = bookStack.erase(----bookStack.end());
+        else {
+            hashSet.erase(----bookStack.end());
+            bookStack.erase(----bookStack.end());
             return;
         }
     }
     
     void process(boost::dynamic_bitset<> *bs) {
         //int cnt = 0;
-        //std::cout << "Looking for a word " << *bs << std::endl;
+        ///std::cout << "Looking for a word " << *bs << std::endl;
         //std::cout <<  "Current stack is: " << std::endl;
         //out();
 
         
         auto pos = findPosition(bs);
-        //std::cout << "Позиция искомого в дэке слова: " << pos << " найдено " << ++cnt << std::endl;
+        //std::cout << "Позиция искомого в дэке слова: " << (*pos << " найдено " << ++cnt << std::endl;
         //std::cout << "Перехуячиваем позиции" << std::endl;
         resetDequePositions(pos);
         //out();
         //std::cout << "Встовляем" << std::endl;
         bookStack.push_front(new boost::dynamic_bitset<>(*bs));
+        outHashSet();
         hashSet.insert(bookStack.begin());
+        std::cout << "Inserting: " << (*bookStack.begin()).key.get() << std::endl;
+        outHashSet();
+        
         //out();
         
 #ifndef DEBUG

@@ -45,17 +45,17 @@ int main(int argc, const char * argv[]) {
 //    }
     
 //    chi->out();
-    int wSize = 24;
-    int exp = 24;
+    int wSize = 10;
+    int exp = 10;
     
     auto mtf = new MoveToFrontList(wSize, exp);
     //mtf->out();
     //std::cout << mtf->bookStack.size() << std::endl;
         time_t now;
         time(&now);
-        for (int i = 0; i < 10000000; i++) {
-            //std::cout << "iteration #" << i << std::endl;
-            auto tmp = new boost::dynamic_bitset<>(wSize, rand()%(int)pow(2, 24));
+        for (int i = 0; i < 10; i++) {
+            std::cout << "iteration #" << i << std::endl;
+            auto tmp = new boost::dynamic_bitset<>(wSize, rand()%8);
             mtf->process(tmp);
         }
         time_t end;
