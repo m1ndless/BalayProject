@@ -8,8 +8,3 @@
 
 #include "OrderedMoveToFront.h"
 
-#include <map>
-
-class OrderedMoveToFront {
-    std::map<int, int> test;
-};
