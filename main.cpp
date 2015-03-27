@@ -15,6 +15,7 @@
 #include "MoveToFrontList.h"
 #include <memory>
 #include "OrderedMoveToFront.h"
+#include "Ordered.h"
 
 #include "chiSquare.h"
 
@@ -67,11 +68,26 @@ int main(int argc, const char * argv[]) {
     //    mtf->bookStack.erase(*it);
     //}
     
-    
-    auto omtf = new OrderedMoveToFront(wSize, exp);
-    omtf->outBookStack();
-    std::cout << "---------------------" << std::endl;
-    omtf->outHashSet();
-    
+	//        time_t now;
+	//        time(&now);
+ //   //auto omtf = new OrderedMoveToFront(wSize, exp);
+
+	//for (int i = 0; i < 100000; i++) {
+	//	std::cout << i << std::endl;
+	//	omtf->find(rand()%(int)pow(2,24));
+	//}
+	//        time_t end;
+	//        time(&end);
+	//    std::cout << end - now << std::endl;
+
+	auto ord = new Ordered(wSize, exp);
+
+	for (int i = 0; i < 10; i++) {
+		auto tmp = Ordered::Key(rand() % 8, 0);
+		ord->find(tmp);
+	}
+	ord->out();
+
+	getchar();
     return 0;
 }

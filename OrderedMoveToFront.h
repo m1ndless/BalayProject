@@ -42,9 +42,18 @@ private:
             return hash_fn(it->get()->second);
         }
     };
+
+	struct IteratorEqual
+	{
+		bool operator()(const std::multiset<Key>::iterator& lhs, const std::multiset<Key>::iterator& rhs) {
+			return (*lhs)->second == (*rhs)->second;
+		}
+	};
+
     
-    std::unordered_set<std::multiset<Key>::iterator, OrderedMoveToFront::Hasher> hashSet;
+    std::unordered_set<std::multiset<Key>::iterator, OrderedMoveToFront::Hasher, OrderedMoveToFront::IteratorEqual> hashSet;
     std::multiset<Key, less_key> bookStack;
+	std::multiset<Key>::iterator it;
     
 public:
     OrderedMoveToFront(size_t _wLength, unsigned int _exponent) : wLength(_wLength), exponent(_exponent) {
@@ -56,7 +65,9 @@ public:
             auto tmp = std::shared_ptr<std::pair<int, unsigned long>>(new std::pair<int, unsigned long>(0, i));
             bookStack.insert(tmp);
         }
-        
+		auto tmp = std::shared_ptr<std::pair<int, unsigned long>>(new std::pair<int, unsigned long>(0, pow(2, exponent)));
+		//bookStack.insert(tmp);
+		//this->it = --bookStack.end();
         for (auto it = begin(bookStack); it != end(bookStack); ++it) {
             hashSet.insert(it);
         }
@@ -65,19 +76,74 @@ public:
     void outBookStack() {
         std::cout << "size is: " << bookStack.size() << std::endl;
         for (auto it = std::begin(bookStack); it != std::end(bookStack); ++it) {
-            std::cout << (*it).get()->first << "\t" << (*it).get()->second << std::endl;
+            //std::cout << (*it).get()->first << "\t" << (*it).get()->second << std::endl;
+			std::cout << it->get() << "\t" << (*it).get()->first << "\t" << (*it).get()->second << std::endl;
         }
     }
     
     void outHashSet(){
+		std::cout << "size is: " << hashSet.size() << std::endl;
         for (auto it = std::begin(hashSet); it != std::end(hashSet); ++it) {
-            std::cout << (*it)->get()->first << "\t" << (*it)->get()->second << std::endl;
+            //std::cout << (*it)->get()->first << "\t" << (*it)->get()->second << std::endl;
+			std::cout << (*it)->get() << "\t" << (*it)->get()->first << "\t" << (*it)->get()->second << std::endl;
         }
     }
     
     void process(boost::dynamic_bitset<> *bs) {
-        
+		unsigned long value = bs->to_ulong();
     }
+
+	void find(unsigned long value) {
+		//std::cout << "Looking for " << value << std::endl;
+		//(*it)->second = value;
+		//auto freq = (*it)->first;
+		//auto iter = hashSet.find(it);
+		
+
+		auto found = bookStack.find(std::shared_ptr<std::pair<int, unsigned long>>(new std::pair<int, unsigned long>(0, value)));
+
+		if (found == bookStack.end()) {
+			bookStack.erase(--bookStack.end());
+		}
+		else {
+			int freq = (*found)->first;
+			bookStack.erase(found);
+			bookStack.insert(std::shared_ptr<std::pair<int, unsigned long>>(new std::pair<int, unsigned long>(++freq, value)));
+		}
+
+		
+
+		
+
+		//auto copy(it);
+
+		//std::cout << "BookStack is" << std::endl;
+		//outBookStack();
+		//std::cout << "Hashset is" << std::endl;
+		//outHashSet();
+
+		//Key tmp = nullptr;
+		//if (iter != hashSet.end()) {
+		//	std::cout << "Deleting " << (*it).get() <<std::endl;
+		//	//hashSet.erase(iter);
+		//	bookStack.erase(*iter);
+		//	tmp = std::shared_ptr<std::pair<int, unsigned long>>(new std::pair<int, unsigned long>(++freq, value));
+		//}
+
+		//else {
+		//	std::cout << "Not found" << std::endl;
+		//	hashSet.erase(--bookStack.end());
+		//	bookStack.erase(--bookStack.end());
+		//	tmp = std::shared_ptr<std::pair<int, unsigned long>>(new std::pair<int, unsigned long>(1, value));
+		//	
+		//}
+		//bookStack.insert(tmp);
+		//hashSet.insert(copy);
+		//std::cout << "BookStack is" << std::endl;
+		//outBookStack();
+		//std::cout << "Hashset is" << std::endl;
+		//outHashSet();
+	}
     
     
     
