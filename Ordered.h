@@ -24,7 +24,8 @@ public:
 
 	struct PtrEqual {
 		size_t operator()(const Key* lhs, const Key* rhs) const {
-			return lhs->first == rhs->first;
+            bool tmp = lhs->first == rhs->first;
+            return tmp;
 		}
 	};
 
@@ -50,7 +51,7 @@ public:
 		auto found = hashSet.find(&key);
 		if (found != hashSet.end()) {
 			auto freq = (*found)->second;
-			std::cout << "found " << (*found)->first << std::endl;
+			//std::cout << "found " << (*found)->first << std::endl;
 			if (freq == data.size() - 1) {
 				data.push_back(std::unordered_set<Key*, PtrHasher, PtrEqual>());
 			}
@@ -61,11 +62,11 @@ public:
 			data[++(*new_pair).second].insert(new_pair);
 			hashSet.insert(new_pair);
 		}
-
 		else {
+            //std::cout << "not found" << std::endl;
 			key.second = 1;
 			data[1].insert(&key);
-			data[0].erase(--std::end(data[0]));
+			data[0].erase(--data[0].end());
 		}
 	}
 };

@@ -21,6 +21,14 @@
 
 int MoveToFrontList::cnt = 0;
 
+
+struct Govnohasher {
+    size_t operator()(const int it) const {
+        return 1;
+    }
+};
+
+
 int main(int argc, const char * argv[]) {
     // insert code here...
 	setlocale(LC_ALL, "Russian");
@@ -47,8 +55,8 @@ int main(int argc, const char * argv[]) {
 //    }
     
 //    chi->out();
-    int wSize = 12;
-    int exp = 12;
+    int wSize = 24; //длина слова - 24 бита
+    int exp = 20; //показатель степени двойки
     
     //auto mtf = new MoveToFrontList(wSize, exp);
     //mtf->out();
@@ -81,21 +89,31 @@ int main(int argc, const char * argv[]) {
 	//    std::cout << end - now << std::endl;
 
 
-
-	std::cout << "init" << std::endl;
-	auto ord = new Ordered(wSize, exp);
-	
-	std::cout << "process started" << std::endl;
-	time_t now;
-	time(&now);
-	for (int i = 0; i < 4000; i++) {
-		auto tmp = Ordered::Key(rand(), 0);
-		ord->find(tmp);
-	}
-	    time_t end;
-	    time(&end);
-	    std::cout << end - now << std::endl;
-		std::cout << ord->data.size() << std::endl;
-	getchar();
+//	std::cout << "init" << std::endl;
+//	auto ord = new Ordered(wSize, exp);
+//	
+//	std::cout << "process started" << std::endl;
+//	time_t now;
+//	time(&now);
+//	for (int i = 0; i < 20000000; i++) {
+//		auto tmp = Ordered::Key(rand() % (int)pow(2, exp), 0);
+//		ord->find(tmp);
+//	}
+//	    time_t end;
+//	    time(&end);
+//	    std::cout << end - now << std::endl;
+//		std::cout << ord->data.size() << std::endl;
+    
+    //std::unordered_set<int, Govnohasher> test;
+    std::unordered_set<int> test;
+    for (int i = 0; i < 10000; i++) {
+        auto tmp = rand();
+        test.insert(i);
+    }
+    
+    for (auto it = test.begin(); it != test.end(); ++it) {
+        std::cout << *it << std::endl;
+    }
+    
     return 0;
 }
