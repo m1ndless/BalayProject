@@ -47,8 +47,8 @@ int main(int argc, const char * argv[]) {
 //    }
     
 //    chi->out();
-    int wSize = 3;
-    int exp = 3;
+    int wSize = 12;
+    int exp = 12;
     
     //auto mtf = new MoveToFrontList(wSize, exp);
     //mtf->out();
@@ -80,14 +80,22 @@ int main(int argc, const char * argv[]) {
 	//        time(&end);
 	//    std::cout << end - now << std::endl;
 
-	auto ord = new Ordered(wSize, exp);
 
-	for (int i = 0; i < 10; i++) {
-		auto tmp = Ordered::Key(rand() % 8, 0);
+
+	std::cout << "init" << std::endl;
+	auto ord = new Ordered(wSize, exp);
+	
+	std::cout << "process started" << std::endl;
+	time_t now;
+	time(&now);
+	for (int i = 0; i < 4000; i++) {
+		auto tmp = Ordered::Key(rand(), 0);
 		ord->find(tmp);
 	}
-	ord->out();
-
+	    time_t end;
+	    time(&end);
+	    std::cout << end - now << std::endl;
+		std::cout << ord->data.size() << std::endl;
 	getchar();
     return 0;
 }

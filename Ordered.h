@@ -13,7 +13,6 @@
 
 class Ordered {
 public:
-
 	typedef std::pair<unsigned long, int> Key;
 
 	struct PtrHasher {
@@ -25,7 +24,7 @@ public:
 
 	struct PtrEqual {
 		size_t operator()(const Key* lhs, const Key* rhs) const {
-			return lhs->first == lhs->first;
+			return lhs->first == rhs->first;
 		}
 	};
 
@@ -51,6 +50,7 @@ public:
 		auto found = hashSet.find(&key);
 		if (found != hashSet.end()) {
 			auto freq = (*found)->second;
+			std::cout << "found " << (*found)->first << std::endl;
 			if (freq == data.size() - 1) {
 				data.push_back(std::unordered_set<Key*, PtrHasher, PtrEqual>());
 			}
@@ -68,16 +68,4 @@ public:
 			data[0].erase(--std::end(data[0]));
 		}
 	}
-
-	void out() {
-		for (int i = 0; i < data.size(); i++) {
-			std::cout << "\t"<< "freq " << i << std::endl;
-			for (auto it = std::begin(data[i]); it != std::end(data[i]); ++it) {
-				std::cout << (*it)->first << "\t" << (*it)->second << std::endl;
-			}
-			std::cout << "-------------------" << std::endl;
-		}
-		
-	}
-
 };
