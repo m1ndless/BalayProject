@@ -20,6 +20,7 @@
 #include "chiSquare.h"
 
 int MoveToFrontList::cnt = 0;
+int Ordered::cnt = 0;
 
 
 struct Govnohasher {
@@ -28,6 +29,13 @@ struct Govnohasher {
     }
 };
 
+float stats(int wLen, int exp, int cnt, int n) {
+	float p = 1 / pow(2, wLen - exp);
+	std::cout << p << std::endl;
+	auto tmp1 = ((cnt - n*p)*(cnt - n*p)) / (n*p);
+	auto tmp2 = ((n - cnt) - n*(1 - p))*((n - cnt) - n*(1 - p)) / (n*(1 - p));
+	return tmp1 + tmp2;
+}
 
 int main(int argc, const char * argv[]) {
     // insert code here...
@@ -55,9 +63,8 @@ int main(int argc, const char * argv[]) {
 //    }
     
 //    chi->out();
-    int wSize = 24; //длина слова - 24 бита
-    int exp = 20; //показатель степени двойки
-    
+    int wSize = 30; //длина слова - 24 бита
+    int exp = 21; //показатель степени двойки
     //auto mtf = new MoveToFrontList(wSize, exp);
     //mtf->out();
     //std::cout << mtf->bookStack.size() << std::endl;
@@ -89,31 +96,32 @@ int main(int argc, const char * argv[]) {
 	//    std::cout << end - now << std::endl;
 
 
-//	std::cout << "init" << std::endl;
-//	auto ord = new Ordered(wSize, exp);
-//	
-//	std::cout << "process started" << std::endl;
-//	time_t now;
-//	time(&now);
-//	for (int i = 0; i < 20000000; i++) {
-//		auto tmp = Ordered::Key(rand() % (int)pow(2, exp), 0);
-//		ord->find(tmp);
-//	}
-//	    time_t end;
-//	    time(&end);
-//	    std::cout << end - now << std::endl;
-//		std::cout << ord->data.size() << std::endl;
+	std::cout << "init" << std::endl;
+	auto ord = new Ordered(wSize, exp);
+	
+	std::cout << "process started" << std::endl;
+	time_t now;
+	time(&now);
+	int count = (int)pow(2, exp);
+	for (int i = 0; i < count; i++) {
+		//testing for wLen == 20; RAND_MAX = 65k
+		auto tmp = Ordered::Key(rand() * rand(), 0);
+		ord->find(tmp);
+	}
+	    time_t end;
+	    time(&end);
+		std::cout << "h2 = " << stats(wSize, exp, Ordered::cnt, count) << std::endl;
     
     //std::unordered_set<int, Govnohasher> test;
-    std::unordered_set<int> test;
-    for (int i = 0; i < 10000; i++) {
-        auto tmp = rand();
-        test.insert(i);
-    }
-    
-    for (auto it = test.begin(); it != test.end(); ++it) {
-        std::cout << *it << std::endl;
-    }
-    
+    //std::unordered_set<int> test;
+    //for (int i = 0; i < 10000; i++) {
+    //    auto tmp = rand();
+    //    test.insert(i);
+    //}
+    //
+    //for (auto it = test.begin(); it != test.end(); ++it) {
+    //    std::cout << *it << std::endl;
+    //}
+		getchar();
     return 0;
 }

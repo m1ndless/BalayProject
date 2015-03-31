@@ -13,6 +13,7 @@
 
 class Ordered {
 public:
+	static int cnt;
 	typedef std::pair<unsigned long, int> Key;
 
 	struct PtrHasher {
@@ -50,21 +51,32 @@ public:
 	void find(Key key) {
 		auto found = hashSet.find(&key);
 		if (found != hashSet.end()) {
+			//std::cout << "We've found element (" << (*found)->first << ", " << (*found)->second << ")" << std::endl;
 			auto freq = (*found)->second;
-			//std::cout << "found " << (*found)->first << std::endl;
 			if (freq == data.size() - 1) {
 				data.push_back(std::unordered_set<Key*, PtrHasher, PtrEqual>());
 			}
-			auto sec = (*found)->second;
-			auto new_pair = new Key((*found)->first, sec);
-			data[sec].erase(*found);
-			hashSet.erase(*found);
-			data[++(*new_pair).second].insert(new_pair);
-			hashSet.insert(new_pair);
+			auto foundInStack = data[freq].find(*found);
+			if (foundInStack != data[freq].end()) {
+				cnt++;
+				auto new_pair = new Key((*foundInStack)->first, ++(*foundInStack)->second);
+				data[freq].erase(*found);
+				hashSet.erase(*found);
+				data[new_pair->second].insert(new_pair);
+				hashSet.insert(new_pair);
+			}
+			else {
+				data[freq].erase(*found); 
+				(*found)->second++;
+				data[++freq].insert(*found);
+				data[0].erase(--data[0].end());
+			}
 		}
 		else {
-            //std::cout << "not found" << std::endl;
 			key.second = 1;
+			if (data.size() < 2) {
+				data.push_back(std::unordered_set<Key*, PtrHasher, PtrEqual>());
+			}
 			data[1].insert(&key);
 			data[0].erase(--data[0].end());
 		}
