@@ -150,7 +150,8 @@ public:
             //std::cout << "word is: "<< *(*res)->key.get() << std::endl;
         if (res != hashSet.end()) {
 			//std::cout << "zaebis" << std::endl;
-            topPartCount++;
+            //topPartCount++;
+            cnt++;
             //std::cout << "word is: "<< *(*res)->key.get() << std::endl;
 			return *res;
         }
@@ -188,10 +189,10 @@ public:
         //out();
         //std::cout << "Встовляем" << std::endl;
         bookStack.push_front(new boost::dynamic_bitset<>(*bs));
-        outHashSet();
+        //outHashSet();
         hashSet.insert(bookStack.begin());
-        std::cout << "Inserting: " << (*bookStack.begin()).key.get() << std::endl;
-        outHashSet();
+        //std::cout << "Inserting: " << (*bookStack.begin()).key.get() << std::endl;
+        //outHashSet();
         
         //out();
         
