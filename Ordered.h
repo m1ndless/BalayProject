@@ -8,6 +8,8 @@
 #include <memory>
 #include <iostream>
 #include <vector>
+#include <random>
+#include <algorithm>
 #include <boost/dynamic_bitset.hpp>
 #include <utility>
 
@@ -24,7 +26,7 @@ public:
 	};
 
 	struct PtrEqual {
-		size_t operator()(const Key* lhs, const Key* rhs) const {
+		bool operator()(const Key* lhs, const Key* rhs) const {
             bool tmp = lhs->first == rhs->first;
             return tmp;
 		}
@@ -37,15 +39,49 @@ public:
 
 	Ordered(size_t _wLen, int _exp) : wLen(_wLen), exp(_exp) {
 		init();
+		//hashSet = std::unordered_set<Key*, PtrHasher, PtrEqual>((size_t)pow(2, wLen));
+	}
+
+	bool zalupa(const Key* lhs, const Key* rhs) {
+		return lhs->first == rhs->first;
 	}
 
 	void init() {
+
+		std::mt19937_64 gen{ std::random_device()() };
+		std::uniform_int_distribution<int> uid(0, (size_t)pow(2, exp));
+
+		std::vector<Key*> vector((size_t)pow(2, exp));
+		int pos = 0;
+		do {
+			std::generate(std::begin(vector) + pos, std::end(vector), [&uid, &gen]() -> Key* { return new Key(uid(gen), 0); });
+			auto it = std::unique(vector.begin(), vector.end(), zalupa);
+			vector.resize(std::distance(std::begin(vector), it));
+			pos = vector.size();
+			std::cout << pos << std::endl;
+			vector.resize((size_t)pow(2, exp));
+		} while (pos != (size_t)pow(2, exp));
+
+		std::vector<unsigned long> v;
+		for (auto it = std::begin(vector); it != std::end(vector); ++it) {
+			v.push_back((*it)->first);
+		}
+		std::sort(v.begin(), v.end());
+		for (auto it = v.begin(); it != end(v); ++it) {
+			std::cout << *it << std::endl;
+		}
+
+
+
+		auto tmp = std::unordered_set<Key*, PtrHasher, PtrEqual>(std::make_move_iterator(std::begin(vector)), std::make_move_iterator(std::end(vector)));
+
 		data.push_back(std::unordered_set<Key*, PtrHasher, PtrEqual>());
 		for (int i = 0; i < pow(2, exp); i++) {
 			auto pair = new Key(i, 0);
-			hashSet.insert(pair);
-			data[0].insert(pair);
+			//hashSet.insert(pair);
+			//data[0].insert(pair);
 		}
+		std::cout << "zaebok" << std::endl;
 	}
 
 	void find(Key key) {
