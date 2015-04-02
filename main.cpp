@@ -34,9 +34,9 @@ float stats(int wLen, int exp, int cnt, int n) {
 int main(int argc, const char * argv[]) {
 	setlocale(LC_ALL, "Russian");
     srand(time(NULL));
-    int wSize = 10;
-    int exp = 9;
-	std::size_t count = 1024;
+    int wSize = 3;
+    int exp = 4;
+	std::size_t count = 12;
 
 	std::mt19937_64 gen { std::random_device()() };
 	std::uniform_int_distribution<int> uid(0, count);
@@ -87,7 +87,7 @@ int main(int argc, const char * argv[]) {
 	std::cout << "process started" << std::endl;
 	//int count = (int)pow(2, exp);
 	for (int i = 0; i < count; i++) {
-		auto tmp = Ordered::Key(rand() * rand(), 0);
+		auto tmp = Ordered::Key(rand()%(unsigned long)pow(2, exp), 0);
 		ord->find(tmp);
 	}
 		std::cout << "h2 = " << stats(wSize, exp, Ordered::cnt, count) << std::endl;
