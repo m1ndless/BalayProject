@@ -143,9 +143,6 @@ public:
         
         *it = Key(el);
         
-        auto t = hashSet.hash_function();
-        auto m = hashSet.key_eq();
-        
 		auto res = hashSet.find(it);
             //std::cout << "word is: "<< *(*res)->key.get() << std::endl;
         if (res != hashSet.end()) {
