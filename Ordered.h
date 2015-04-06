@@ -48,13 +48,6 @@ public:
 		}
 	};
 
-
-	//struct Generator {
-	//	Generator() : m_value(0) { }
-	//	Key* operator()() { return Key(m_value++, 0); }
-	//	unsigned long m_value;
-	//};
-
 	struct SetComparator {
 		bool operator() (const Key& lhs, const Key& rhs) {
 			return lhs->first < rhs->first;
@@ -64,7 +57,6 @@ public:
 	struct IteratorHash {
 		size_t operator()(const std::list<Key>::iterator& it) const {
 			std::hash<unsigned long> hash_fn;
-			//std::cout << "HASHIM: " << ((*it)->first);
 			return hash_fn((*it)->first);
 		}
 	};
@@ -91,6 +83,7 @@ public:
 		std::mt19937 re(rd());
 		std::uniform_int_distribution<unsigned long> ui(0, (unsigned long)pow(2, wLen) - 1);
 		data.push_back(std::list<Key>());
+		data.push_back(std::list<Key>()); //Òàê íàäî
 		std::unordered_set<Key, Hasher, Equal> base_data;
 		if (exp != wLen) {
 			while (base_data.size() != (size_t)pow(2, exp)) {
@@ -101,10 +94,7 @@ public:
         else {
             assert("nelza");
         }
-        
-		//auto kostil = Key(new std::pair<unsigned long, int>((unsigned long)pow(2, wLen), 0));
-		//base_data.insert(kostil);
-        
+                
 		std::copy(std::begin(base_data), std::end(base_data), std::back_inserter(data[0]));
 		for (auto iter = std::begin(data[0]); iter != std::end(data[0]); ++iter) {
 			hashSet.insert(iter);
@@ -131,153 +121,55 @@ public:
 
 	void find(Key& key) {
         
+		//outhash();
         std::list<Key> temp;
         temp.push_front(key);
 
-        
-        
         auto found = hashSet.find(temp.begin());
         
-        if (found != hashSet.end()) {
+        if (found != hashSet.end()) { //Äîáàâèòü óäàëåíèå
             std::cout << "lurking for " << (*found)->get()->first << "\t" << (*found)->get()->second << "\t"  << (*found)->get() << std::endl;
-//            auto freq = (*found)->get()->second;
-//            if (freq == data.size() - 1) {
-//                data.push_back(std::list<Key>());
-//            }
-//            freq++;
-//            
-//            data[freq].push_front(Key(new std::pair<unsigned long, int>((*found)->get()->first, freq)));
-//            //hashSet.insert(std::list<Key>::iterator(temp.begin()));
-//            auto sz = 0;
-//            for (int i = 0; i < data.size(); i++) {
-//                sz += data[i].size();
-//            }
-//            if (sz > (unsigned long)pow(2, exp)) {
-//                data[freq-1].pop_back();
-//            }
             int sz0 = 0;
             for (int i = 0; i < data.size(); i++) {
                 sz0 += data[i].size();
             }
-            
             int freq = (*found)->get()->second;
-        
             if (freq == data.size() - 1) {
                 data.push_back(std::list<Key>());
             }
-            
-            auto frenq = (*found)->get()->second++;
-            
-            std::cout << " opa " << std::endl;
-            
+			(*found)->get()->second += 1;
+            std::cout << " opa " << std::endl;   
         }
         
+
+
+		//ÇÀÅÁÈÑÜ, ÍÅ ÒĞÎÃÀÒÜ
         else {
             std::cout << "not found " << temp.begin()->get()->first << "\t" << temp.begin()->get()->second << "\t"  << temp.begin()->get() << std::endl;
             auto freq = temp.begin()->get()->second;
-            if (freq == data.size() - 1) {
-                data.push_back(std::list<Key>());
-            }
             temp.begin()->get()->second++;
             auto insert = Key(new std::pair<unsigned long, int>(temp.begin()->get()->first, 1));
-            hashSet.insert(std::list<Key>::iterator(temp.begin()));
             data[1].push_front(insert);
-            data[0].pop_back();
+			hashSet.insert(data[1].begin());
+
+			for (int i = 0; i < data.size(); i++) {
+				if (data[i].size()) {
+					auto tmp = std::list<Key>::iterator(--(data[i]).end());
+					hashSet.erase(--data[i].end());
+					hashSet.insert(tmp);
+					data[i].pop_back();
+					break;
+				}
+			}
         }
 
-//        for (auto &l : data) {
-//        	std::cout << "freq is: " << std::endl;
-//        	for (auto &el : l) {
-//        		std::cout << el->first << "\t" << el->second << "\t" << el << std::endl;
-//        	}
-//        	std::cout << "------------" << std::endl;
-//        }
-        outhash();
-		//*it = Key(key);
-		//outhash();
-		//auto found = hashSet.find(it);
-		//if (found != hashSet.end()) {
-		//	auto freq = (*found)->get()->second;
-		//	freq++;
-		//	std::cout << "Freq is " << freq << std::endl;
-		//	std::cout << "lurking for " << (*found)->get()->first << "\t" << (*found)->get()->second << "\t"  <<&found << std::endl;
-		//	if (freq == data.size()) {
-		//		std::cout << (freq == data.size() - 1) << std::endl;
-		//		data.push_back(std::list<Key>());
-		//	}
-		//	data[freq].push_front(Key(new std::pair<unsigned long, int>((*it)->first, freq)));
-		//	auto inData = data[freq].erase(*found);
-			
-		//}
-
-		//if (found == hashSet.end()) {
-		//	std::cout << "lurking for but not found: " << (*it)->first << "\t" << (*it)->second << "\t " << *it << std::endl;
-			//auto freq = (*it)->second;
-			//if (freq == data.size() - 1) {
-			//	data.push_back(std::list<Key>());
-			//}
-			//std::cout << data.size() << "SUKAAAAAAAAAAAAAA" <<  std::endl;
-			//auto toDelete = ((--std::end(data[freq])) == it) ? --std::end(data[freq]) : ----std::end(data[freq]);
-			////data[freq].erase(toDelete);
-			//freq++;
-
-			//for (auto &l : data) {
-			//	std::cout << "freq is: " << std::endl;
-			//	for (auto &el : l) {
-			//		std::cout << el->first << "\t" << el->second << "\t" << el << std::endl;
-			//	}
-			//	std::cout << "------------" << std::endl;
-			//}
-
-
-			//data[freq].push_front(Key(new std::pair<unsigned long, int>((*it)->first, freq)));
-		//}
-
-		//for (auto &l : data) {
-		//	std::cout << "freq is: " << std::endl;
-		//	for (auto &el : l) {
-		//		std::cout << el->first << "\t" << el->second << "\t" << el << std::endl;
-		//	}
-		//	std::cout << "------------" << std::endl;
-		//}
-
-		//auto found = hashSet.find(&key);
-		//std::cout << "lurking for " << key.first << "\t " << key.second << std::endl;
-		//if (found != hashSet.end()) {
-		//	//std::cout << "We've found element (" << (*found)->first << ", " << (*found)->second << ")" << std::endl;
-		//	auto freq = (*found)->second;
-		//	if (freq == data.size() - 1) {
-		//		data.push_back(std::set<Key*, SetComparator>());
-		//	}
-		//	auto foundInStack = data[freq].find(*found);
-		//	if (foundInStack != data[freq].end()) {
-		//		cnt++;
-		//		auto new_pair = new Key((*foundInStack)->first, ++(*foundInStack)->second);
-		//		data[freq].erase(*found);
-		//		hashSet.erase(*found);
-		//		data[new_pair->second].insert(new_pair);
-		//		hashSet.insert(new_pair);
-		//	}
-		//	else {
-		//		data[freq].erase(*found); 
-		//		(*found)->second++;
-		//		data[++freq].insert(*found);
-		//		data[0].erase(--data[0].end());
-		//	}
-		//}
-		//else {
-		//	key.second = 1;
-		//	if (data.size() < 2) {
-		//		data.push_back(std::set<Key*, SetComparator>());
-		//	}
-		//	data[1].insert(&key);
-		//	data[0].erase(--data[0].end());
-		//}
-		//for (int i = 0; i < data.size(); i++) {
-		//	for (auto it = data[i].begin(); it != data[i].end(); ++it) {
-		//		std::cout << "frenq " << i << ":\t" << (*it)->first << "\t" << (*it)->second << std::endl;
-		//	}
-		//}
-		//std::cout << "-------------------------" << std::endl;
+        for (auto &l : data) {
+        	std::cout << "freq is: " << std::endl;
+        	for (auto &el : l) {
+        		std::cout << el->first << "\t" << el->second << "\t" << el << std::endl;
+        	}
+        	std::cout << "------------" << std::endl;
+        }
+        //outhash();
 	}
 };
