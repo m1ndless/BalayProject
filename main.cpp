@@ -34,9 +34,9 @@ float stats(int wLen, int exp, int cnt, int n) {
 int main(int argc, const char * argv[]) {
 	setlocale(LC_ALL, "Russian");
     srand(time(NULL));
-    int wSize = 4;
-    int exp = 3;
-	std::size_t count = 12;
+    int wSize = 32;
+    int exp = 24;
+	std::size_t count = 10000000;
 
 	//std::mt19937_64 gen { std::random_device()() };
 	//std::uniform_int_distribution<int> uid(0, count);
@@ -86,14 +86,12 @@ int main(int argc, const char * argv[]) {
 	auto ord = new Ordered(wSize, exp);
 	std::cout << "process started" << std::endl;
 	//int count = (int)pow(2, exp);
-	for (int i = 0; i < 10; i++) {
-		//auto tmp = std::shared_ptr(new std::pair<unsigned long, int>(rand()%(unsigned long)pow(2, wSize), 0));
-//		auto tmp = std::shared_ptr<std::pair<unsigned long, int>>(new std::pair<unsigned long, int>(rand() % (unsigned long)pow(2, wSize), 0));
+	for (int i = 0; i < count; i++) {
 		auto tmp = std::shared_ptr<std::pair<unsigned long, int>>(new std::pair<unsigned long, int>(rand() % (unsigned long)pow(2, wSize), 0));
 		ord->find(tmp);
 	}
-		std::cout << "h2 = " << stats(wSize, exp, Ordered::cnt, count) << std::endl;
+		//std::cout << "h2 = " << stats(wSize, exp, Ordered::cnt, count) << std::endl;
     //-----------------------------------------------------------------------------------------
-	getchar();
+	//getchar();
     return 0;
 }
