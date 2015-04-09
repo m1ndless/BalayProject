@@ -86,10 +86,10 @@ int main(int argc, const char * argv[]) {
 	auto ord = new Ordered(wSize, exp);
 	std::cout << "process started" << std::endl;
 	//int count = (int)pow(2, exp);
-	for (int i = 0; i < 5; i++) {
+	for (int i = 0; i < 10; i++) {
 		//auto tmp = std::shared_ptr(new std::pair<unsigned long, int>(rand()%(unsigned long)pow(2, wSize), 0));
 //		auto tmp = std::shared_ptr<std::pair<unsigned long, int>>(new std::pair<unsigned long, int>(rand() % (unsigned long)pow(2, wSize), 0));
-        auto tmp = std::shared_ptr<std::pair<unsigned long, int>>(new std::pair<unsigned long, int>(13, 0));
+		auto tmp = std::shared_ptr<std::pair<unsigned long, int>>(new std::pair<unsigned long, int>(rand() % (unsigned long)pow(2, wSize), 0));
 		ord->find(tmp);
 	}
 		std::cout << "h2 = " << stats(wSize, exp, Ordered::cnt, count) << std::endl;

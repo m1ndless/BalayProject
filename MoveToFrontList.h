@@ -166,6 +166,7 @@ public:
             return;
         }
         else {
+			//FIX IT !
             hashSet.erase(----bookStack.end());
             bookStack.erase(----bookStack.end());
             return;

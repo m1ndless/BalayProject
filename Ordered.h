@@ -68,7 +68,7 @@ public:
 		}
 	};
 
-	std::vector<std::list<Key>> data;
+	std::vector<std::list<Key> *> data;
 	std::unordered_set<std::list<Key>::iterator, IteratorHash, IteratorEqual> hashSet;
 
 	Ordered(int _wLen, int _exp) : wLen(_wLen), exp(_exp) {
@@ -79,12 +79,11 @@ public:
 	}
     
 	void init() {
+		
 		std::random_device rd;
 		std::mt19937 re(rd());
 		std::uniform_int_distribution<unsigned long> ui(0, (unsigned long)pow(2, wLen) - 1);
-		data.push_back(std::list<Key>());
-		data.push_back(std::list<Key>()); 
-		data.push_back(std::list<Key>()); //Òàê íàäî
+		
 		std::unordered_set<Key, Hasher, Equal> base_data;
 		if (exp != wLen) {
 			while (base_data.size() != (size_t)pow(2, exp)) {
@@ -95,9 +94,15 @@ public:
         else {
             assert("nelza");
         }
+
+
+		data = std::vector<std::list<Key>*>();
+		data.push_back(new std::list<Key>());
+		data.push_back(new std::list<Key>());
+		data.push_back(new std::list<Key>()); //Òàê íàäî
                 
-		std::copy(std::begin(base_data), std::end(base_data), std::back_inserter(data[1]));
-		for (auto iter = std::begin(data[1]); iter != std::end(data[1]); ++iter) {
+		std::copy(std::begin(base_data), std::end(base_data), std::back_inserter(*data[1]));
+		for (auto iter = std::begin(*data[1]); iter != std::end(*data[1]); ++iter) {
 			hashSet.insert(iter);
 		}
 
@@ -105,7 +110,7 @@ public:
         
         for (auto &l : data) {
             std::cout << "freq is: " << std::endl;
-            for (auto &el : l) {
+            for (auto &el : *l) {
                 std::cout << el->first << "\t" << el->second << "\t" << el << std::endl;
             }
             std::cout << "------------" << std::endl;
@@ -121,23 +126,63 @@ public:
 	}
 
 	void find(Key& key) {
-        
+		std::cout << "////////////////////////////////" << std::endl;
 		//outhash();
         std::list<Key> temp;
         temp.push_front(key);
 
         auto found = hashSet.find(temp.begin());
         
-        if (found != hashSet.end()) { 
-			auto freq = (*found)->get()->second;
-			if (freq > data.size() - 2) {
-				data.push_back(std::list<Key>());
-			}
-			
-			auto toInsert = Key(new std::pair<unsigned long, int>((*found)->get()->first, (*found)->get()->second + 1));
-			//data[freq+1].push_back(toInsert);
+		if (found != hashSet.end()) {
+			std::cout << "FOUND !! !  " << (*found)->get()->first << "\t" << (*found)->get()->second << "\t" << (*found)->get() << std::endl;
+			auto insert = Key(new std::pair<unsigned long, int>((*found)->get()->first, (*found)->get()->second + 1));
 
-        }
+			auto sz_1 = 0;
+			for (int i = 1; i < data.size(); i++) {
+				sz_1 += data[i]->size();
+			}
+
+			auto freq = (*found)->get()->second;
+			if (freq > data.size() - 3) {
+				data.push_back(new std::list<Key>());
+			}
+
+			auto toInsert = Key(new std::pair<unsigned long, int>((*found)->get()->first, freq + 1));
+			std::cout << "ATATATATATATATA FREQ !!!!!!!!! " << freq << std::endl;
+
+			data[freq + 2]->push_front(toInsert);
+
+
+			auto copy = std::list<Key>::iterator(*found);
+			auto copy2 = std::list<Key>::iterator(*found);
+			hashSet.erase(copy);
+			data[freq + 1]->erase(copy);
+			if(data[0]->size()) data[0]->erase(copy2);
+			//data[0]->erase(copy);
+			hashSet.insert(data[freq + 2]->begin());
+
+
+
+			//trying to delete from both buckets
+			//if (data[0].size()) data[0].erase(temp.begin());
+			//data[freq].erase(found);
+
+
+			auto sz_2 = 0;
+			for (int i = 1; i < data.size(); i++) {
+				sz_2 += data[i]->size();
+			}
+			std::cout << "bil size " << sz_1 << "stal size " << sz_2 << std::endl;
+			if (sz_1 != sz_2) {
+				std::cout << "POPAEM ))))" << std::endl;
+				for (int i = 1; i < data.size(); i++) {
+					if (data[i]->size()) {
+						data[i]->pop_back();
+						break;
+					}
+				}
+			}
+		}
         
 		//ÇÀÅÁÈÑÜ, ÍÅ ÒĞÎÃÀÒÜ
         else {
@@ -145,33 +190,34 @@ public:
             auto freq = temp.begin()->get()->second;
 
 			if (freq > data.size() - 2) {
-				data.push_back(std::list<Key>());
+				data.push_back(new std::list<Key>());
 			}
 
 
             temp.begin()->get()->second++;
             auto insert = Key(new std::pair<unsigned long, int>(temp.begin()->get()->first, 1));
-            data[2].push_front(insert);
-			hashSet.insert(data[2].begin());
+            data[2]->push_front(insert);
+			hashSet.insert(data[2]->begin());
 
 			for (int i = 1; i < data.size(); i++) {
-				if (data[i].size()) {
-					hashSet.erase(--data[i].end());
-					data[0].push_front(std::move(*(--data[i].end())));
-					data[i].resize(data[i].size() - 1);
-					hashSet.insert(data[0].begin());
+				if (data[i]->size()) {
+					hashSet.erase(--data[i]->end());
+					data[0]->push_front(std::move(*(--data[i]->end())));
+					data[i]->resize(data[i]->size() - 1);
+					hashSet.insert(data[0]->begin());
 					break;
 				}
 			}
         }
 		std::cout << " DATA SIZE IS " << data.size() << std::endl;
         for (auto &l : data) {
-        	std::cout << "freq is: " << l.size() << std::endl;
-        	for (auto &el : l) {
+        	std::cout << "freq is: " << l->size() << std::endl;
+        	for (auto &el : *l) {
         		std::cout << el->first << "\t" << el->second << "\t" << el << std::endl;
         	}
         	std::cout << "------------" << std::endl;
         }
+		std::cout << "////////////////////////////////" << std::endl;
         //outhash();
 	}
 };
