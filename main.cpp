@@ -25,18 +25,40 @@ int Ordered::cnt = 0;
 
 float stats(int wLen, int exp, int cnt, int n) {
 	float p = 1 / pow(2, wLen - exp);
-	std::cout << p << std::endl;
+	std::cout << "wLen is: " << wLen << std::endl;
+	std::cout << "exp is: " << exp << std::endl;
+	std::cout << "v stack: " << cnt << std::endl;
+	std::cout << "n is: " << n << std::endl;
+	std::cout << "Prop is: " << p << std::endl;
+	
 	auto tmp1 = ((cnt - n*p)*(cnt - n*p)) / (n*p);
 	auto tmp2 = ((n - cnt) - n*(1 - p))*((n - cnt) - n*(1 - p)) / (n*(1 - p));
 	return tmp1 + tmp2;
 }
 
+float chiStats(int wLen, int bucketCount, std::vector<int> freq, int count) {
+	float result = 0;
+
+	float p = 1 / (float)bucketCount;
+
+	for (auto it = freq.begin(); it != freq.end(); ++it) {
+		result += (*it - count * p)*(*it - count * p) / count*p;
+	}
+
+	return result;
+}
+
 int main(int argc, const char * argv[]) {
 	setlocale(LC_ALL, "Russian");
     srand(time(NULL));
-    int wSize = 32;
-    int exp = 24;
-	std::size_t count = 10000000;
+    int wSize = 16;
+    int exp = 15;
+	std::size_t count = 100000000;
+
+	std::random_device rd;
+	std::mt19937 re(rd());
+	std::uniform_int_distribution<unsigned long> ui(0, (unsigned long)pow(2, wSize) - 1);
+
 
 	//std::mt19937_64 gen { std::random_device()() };
 	//std::uniform_int_distribution<int> uid(0, count);
@@ -64,34 +86,38 @@ int main(int argc, const char * argv[]) {
 //
 //    std::cout << (unsigned long)pow(2, 46) << std::endl;
     
-//    auto chi = new ChiSquare(8, 4);
+    auto chi = new ChiSquare(wSize, 4);
     
-//    for (int i = 0; i < 10; i++) {
-//        auto bs = var->test();
-//        chi->search(bs);
-//    }
+    for (int i = 0; i < count; i++) {
+        //auto bs = var->test();
+		if (i % 10000 == 0) std::cout << i << std::endl;
+        chi->search(ui(re));
+    }
+	std::cout << chiStats(wSize, 4, *chi->frenqInBuckets, count) << std::endl;;
     
-//    chi->out();
+    //chi->out();
     
     //----------------------------- THIS IS MOVE TO FRONT -----------------------------
-//    auto mtf = new MoveToFrontList(wSize, exp);
-//        for (int i = 0; i < 10000000; i++) {
-//            auto tmp = new boost::dynamic_bitset<>(wSize, rand());
-//            mtf->process(tmp);
-//        }
-//    std::cout << end - now << std::endl;
-//    std::cout << "h2 = " << stats(wSize, exp, MoveToFrontList::cnt, count) << std::endl;
+   // auto mtf = new MoveToFrontList(wSize, exp);
+   //     for (int i = 0; i < count; i++) {
+			//auto tmp = new boost::dynamic_bitset<>(wSize, ui(re));
+   //         mtf->process(tmp);
+			//if (i % 10000 == 0) std::cout << i << "size is: " << mtf->size() << std::endl;
+   //     }
+   // //std::cout << end - now << std::endl;
+   // std::cout << "h2 = " << stats(wSize, exp, MoveToFrontList::cnt, count) << std::endl;
     //-----------------------------------------------------------------------------------------
     //----------------------------- THIS IS ORDERED MOVE TO FRONT -----------------------------
-	auto ord = new Ordered(wSize, exp);
-	std::cout << "process started" << std::endl;
-	//int count = (int)pow(2, exp);
-	for (int i = 0; i < count; i++) {
-		auto tmp = std::shared_ptr<std::pair<unsigned long, int>>(new std::pair<unsigned long, int>(rand() % (unsigned long)pow(2, wSize), 0));
-		ord->find(tmp);
-	}
-		//std::cout << "h2 = " << stats(wSize, exp, Ordered::cnt, count) << std::endl;
+	//auto ord = new Ordered(wSize, exp);
+	//std::cout << "process started" << std::endl;
+	////int count = (int)pow(2, exp);
+	//for (int i = 0; i < count; i++) {
+	//	auto tmp = std::shared_ptr<std::pair<unsigned long, int>>(new std::pair<unsigned long, int>(ui(re), 0));
+	//	ord->find(tmp);
+	//	if (i % 10000 == 0) std::cout << i << "size is: " << ord->hashSet.size() <<  std::endl;
+	//}
+	//	std::cout << "h2 = " << stats(wSize, exp, Ordered::cnt, count) << std::endl;
     //-----------------------------------------------------------------------------------------
-	//getchar();
+	getchar();
     return 0;
 }

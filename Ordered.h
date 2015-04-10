@@ -79,6 +79,14 @@ public:
 		std::cout << "test" << std::endl;
 	}
     
+	size_t size() {
+		auto result = 0;
+		for (int i = 1; i < data.size(); i++) {
+			result += data[i]->size();
+		}
+		return result;
+	}
+
 	void init() {
 		
 		std::random_device rd;
@@ -151,15 +159,15 @@ public:
                     stash.insert(std::move(*(--data[i]->end())));
                     data[i]->resize(data[i]->size() - 1);
                     //hashSet.insert(data[0]->begin());
-                    break;
+                    return;
                 }
             }
-            return;
         }
         
         auto found = hashSet.find(temp.begin());
 
 		if (found != hashSet.end()) {
+			cnt++;
 			//std::cout << "FOUND !! !  " << (*found)->get()->first << "\t" << (*found)->get()->second << "\t" << (*found)->get() << std::endl;
 			auto insert = Key(new std::pair<unsigned long, int>((*found)->get()->first, (*found)->get()->second + 1));
 			auto freq = (*found)->get()->second;
@@ -173,6 +181,7 @@ public:
 			hashSet.erase(copy);
 			data[freq + 1]->erase(copy);
 			hashSet.insert(data[freq + 2]->begin());
+			return;
 		}
         
 		//богатая кодировка
@@ -196,19 +205,19 @@ public:
 					hashSet.erase(--data[i]->end());
                     stash.insert(std::move(*(--data[i]->end())));
 					data[i]->resize(data[i]->size() - 1);
-					break;
+					return;
 				}
 			}
         }
-//		std::cout << " DATA SIZE IS " << data.size() << std::endl;
-//        for (auto &l : data) {
-//        	std::cout << "size is: " << l->size() << std::endl;
-//        	for (auto &el : *l) {
-//        		std::cout << el->first << "\t" << el->second << "\t" << el << std::endl;
-//        	}
-//        	std::cout << "------------" << std::endl;
-//        }
-//		std::cout << "////////////////////////////////" << std::endl;
+		//std::cout << " DATA SIZE IS " << data.size() << std::endl;
+  //      for (auto &l : data) {
+  //      	std::cout << "size is: " << l->size() << std::endl;
+  //      	for (auto &el : *l) {
+  //      		std::cout << el->first << "\t" << el->second << "\t" << el << std::endl;
+  //      	}
+  //      	std::cout << "------------" << std::endl;
+  //      }
+		//std::cout << "////////////////////////////////" << std::endl;
         //outhash();
 	}
 };

@@ -18,6 +18,7 @@
 #include <list>
 #include <memory>
 #include <math.h>
+#include <random>
 
 #endif /* defined(__BalayProject__MoveToFrontList__) */
 
@@ -108,11 +109,28 @@ public:
     }
     
     void init() {
+
+
+
+		std::random_device rd;
+		std::mt19937 re(rd());
+		std::uniform_int_distribution<unsigned long> ui(0, (unsigned long)pow(2, wLength) - 1);
+
+		std::unordered_set<Key, hashUtils::KeyHash, hashUtils::KeyEqual> base_data;
+		if (exponent != wLength) {
+			while (base_data.size() != (size_t)pow(2, exponent)) {
+				base_data.insert(Key(new boost::dynamic_bitset<>(ui(re), 0)));
+			}
+		}
+		std::copy(std::begin(base_data), std::end(base_data), std::back_inserter(bookStack));
+
+
         //Добавить рандомизацию, но пока в целях отладки будем использовать последовательные значения
-        for (int i = 0; i < pow(2, this->exponent); i++) {
-            Key tmp(new boost::dynamic_bitset<>(this->wLength, i));
-            bookStack.push_back(tmp);
-        }  
+        //for (int i = 0; i < pow(2, this->exponent); i++) {
+        //    Key tmp(new boost::dynamic_bitset<>(this->wLength, i));
+        //    bookStack.push_back(tmp);
+        //}  
+
         it = bookStack.begin();
         for (;it != bookStack.end(); ++it) {
             hashSet.insert(it);
@@ -126,6 +144,10 @@ public:
             std::cout << (it->key.get()) << std::endl;
             }
     }
+
+	size_t size() {
+		return bookStack.size();
+	}
             
     void outHashSet() {
         //auto t = hashSet.hash_function();
@@ -166,7 +188,7 @@ public:
             return;
         }
         else {
-			//FIX IT !
+			//vse norm
             hashSet.erase(----bookStack.end());
             bookStack.erase(----bookStack.end());
             return;
