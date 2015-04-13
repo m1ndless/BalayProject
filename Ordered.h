@@ -71,6 +71,7 @@ public:
 	std::vector<std::list<Key> *> data;
 	std::unordered_set<std::list<Key>::iterator, IteratorHash, IteratorEqual> hashSet;
     std::unordered_set<Key, Hasher, Equal> stash;
+    int minFreq;
 
 	Ordered(int _wLen, int _exp) : wLen(_wLen), exp(_exp) {
 		this->wLen = _wLen;
@@ -147,6 +148,13 @@ public:
         if (inStash != std::end(stash)) {
             //std::cout << "НАЙДЕНО В СТЭШЕ!!!!!" <<  std::endl;
             auto freq = inStash->get()->second;
+            
+            if (freq < minFreq) {
+                //std::cout << "не вариант, ибо надо "<< minFreq << ", а есть" << freq << std::endl;
+                inStash->get()->second++;
+                return;
+            }
+            
             auto insert = Key(new std::pair<unsigned long, int>(inStash->get()->first, freq + 1));
             data[freq + 2]->push_front(insert);
             hashSet.insert(data[freq + 2]->begin());
@@ -155,10 +163,11 @@ public:
             for (int i = 1; i < data.size(); i++) {
                 if (data[i]->size()) {
                     hashSet.erase(--data[i]->end());
-                    //data[0]->push_front(std::move(*(--data[i]->end())));
                     stash.insert(std::move(*(--data[i]->end())));
                     data[i]->resize(data[i]->size() - 1);
-                    //hashSet.insert(data[0]->begin());
+                    if (data[i]->size()) {
+                        this->minFreq = i - 2;
+                    }
                     return;
                 }
             }
@@ -186,6 +195,7 @@ public:
         
 		//богатая кодировка
         else {
+            //d::cout << "не встречалось " << std::endl;
             //std::cout << "not found " << temp.begin()->get()->first << "\t" << temp.begin()->get()->second << "\t"  << temp.begin()->get() << std::endl;
             auto freq = temp.begin()->get()->second;
 
@@ -196,6 +206,15 @@ public:
 
             temp.begin()->get()->second++;
             auto insert = Key(new std::pair<unsigned long, int>(temp.begin()->get()->first, 1));
+            
+            if (freq < minFreq) {
+                //data[2]->push_front(insert);
+                stash.insert(insert);
+                //data[2]->erase(data[2]->begin());
+                return;
+            }
+            
+            
             data[2]->push_front(insert);
 			hashSet.insert(data[2]->begin());
 
@@ -205,6 +224,9 @@ public:
 					hashSet.erase(--data[i]->end());
                     stash.insert(std::move(*(--data[i]->end())));
 					data[i]->resize(data[i]->size() - 1);
+                    if (data[i]->size()) {
+                        this->minFreq = i - 2;
+                    }
 					return;
 				}
 			}

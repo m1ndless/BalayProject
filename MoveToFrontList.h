@@ -119,10 +119,13 @@ public:
 		std::unordered_set<Key, hashUtils::KeyHash, hashUtils::KeyEqual> base_data;
 		if (exponent != wLength) {
 			while (base_data.size() != (size_t)pow(2, exponent)) {
-				base_data.insert(Key(new boost::dynamic_bitset<>(ui(re), 0)));
+                auto tmp = new boost::dynamic_bitset<>(wLength, ui(re));
+				auto pair = base_data.insert(Key(tmp));
+                if (pair.second == 0) delete tmp;
+                if (base_data.size() % 10000 == 0) std::cout << "current size is: " << base_data.size() << std::endl;
 			}
 		}
-		std::copy(std::begin(base_data), std::end(base_data), std::back_inserter(bookStack));
+		std::move(std::begin(base_data), std::end(base_data), std::back_inserter(bookStack));
 
 
         //Добавить рандомизацию, но пока в целях отладки будем использовать последовательные значения

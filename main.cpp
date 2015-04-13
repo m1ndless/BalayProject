@@ -51,9 +51,9 @@ float chiStats(int wLen, int bucketCount, std::vector<int> freq, int count) {
 int main(int argc, const char * argv[]) {
 	setlocale(LC_ALL, "Russian");
     srand(time(NULL));
-    int wSize = 16;
-    int exp = 15;
-	std::size_t count = 100000000;
+    int wSize = 20;
+    int exp = 10;
+	std::size_t count = 500000000;
 
 	std::random_device rd;
 	std::mt19937 re(rd());
@@ -86,38 +86,38 @@ int main(int argc, const char * argv[]) {
 //
 //    std::cout << (unsigned long)pow(2, 46) << std::endl;
     
-    auto chi = new ChiSquare(wSize, 4);
-    
-    for (int i = 0; i < count; i++) {
-        //auto bs = var->test();
-		if (i % 10000 == 0) std::cout << i << std::endl;
-        chi->search(ui(re));
-    }
-	std::cout << chiStats(wSize, 4, *chi->frenqInBuckets, count) << std::endl;;
+//    auto chi = new ChiSquare(wSize, 2);
+//    
+//    for (int i = 0; i < count; i++) {
+//        //auto bs = var->test();
+//		if (i % 10000 == 0) std::cout << i << std::endl;
+//        chi->search(ui(re));
+//    }
+//	std::cout << chiStats(wSize, 4, *chi->frenqInBuckets, count) << std::endl;
     
     //chi->out();
     
     //----------------------------- THIS IS MOVE TO FRONT -----------------------------
-   // auto mtf = new MoveToFrontList(wSize, exp);
-   //     for (int i = 0; i < count; i++) {
-			//auto tmp = new boost::dynamic_bitset<>(wSize, ui(re));
-   //         mtf->process(tmp);
-			//if (i % 10000 == 0) std::cout << i << "size is: " << mtf->size() << std::endl;
-   //     }
-   // //std::cout << end - now << std::endl;
-   // std::cout << "h2 = " << stats(wSize, exp, MoveToFrontList::cnt, count) << std::endl;
+//    auto mtf = new MoveToFrontList(wSize, exp);
+//        for (int i = 0; i < count; i++) {
+//    auto tmp = new boost::dynamic_bitset<>(wSize, ui(re));
+//    mtf->process(tmp);
+//			if (i % 10000 == 0) std::cout << i << "size is: " << mtf->size() << std::endl;
+//        }
+//    //std::cout << end - now << std::endl;
+//    std::cout << "h2 = " << stats(wSize, exp, MoveToFrontList::cnt, count) << std::endl;
     //-----------------------------------------------------------------------------------------
     //----------------------------- THIS IS ORDERED MOVE TO FRONT -----------------------------
-	//auto ord = new Ordered(wSize, exp);
-	//std::cout << "process started" << std::endl;
-	////int count = (int)pow(2, exp);
-	//for (int i = 0; i < count; i++) {
-	//	auto tmp = std::shared_ptr<std::pair<unsigned long, int>>(new std::pair<unsigned long, int>(ui(re), 0));
-	//	ord->find(tmp);
-	//	if (i % 10000 == 0) std::cout << i << "size is: " << ord->hashSet.size() <<  std::endl;
-	//}
-	//	std::cout << "h2 = " << stats(wSize, exp, Ordered::cnt, count) << std::endl;
+	auto ord = new Ordered(wSize, exp);
+	std::cout << "process started" << std::endl;
+	//int count = (int)pow(2, exp);
+	for (int i = 0; i < count; i++) {
+		auto tmp = std::shared_ptr<std::pair<unsigned long, int>>(new std::pair<unsigned long, int>(ui(re), 0));
+		ord->find(tmp);
+		if (i % 100000 == 0) std::cout << i << "size is: " << ord->hashSet.size() <<  std::endl;
+	}
+      std::cout << "h2 = " << stats(wSize, exp, Ordered::cnt, count) << std::endl;
     //-----------------------------------------------------------------------------------------
-	getchar();
+	//getchar();
     return 0;
 }

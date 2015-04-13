@@ -41,7 +41,7 @@ class ChiSquare {
 		}
 	};
 
-    std::vector<unsigned long> *bucketLimits; //индекс граничного слова
+    std::vector<unsigned long> *bucketLimits; //Г‹ГЊвЂ°Г‚ГЌГ’ вЂћпЈївЂЎГЊГ‹ЛњГЊГ“вЂћГ“ Г’ГЋГ“вЂљвЂЎ
 	
 
 public:
@@ -64,6 +64,7 @@ public:
 		while (data.size() != (size_t)pow(2, wLength)) {
 			auto pair = data.insert(std::pair<unsigned long, int>(ui(re), i));
 			if (pair.second) i++;
+            if (data.size() % 10000 == 0) std::cout << "size is: " <<  data.size() << std::endl;
 		}
 	}
     
