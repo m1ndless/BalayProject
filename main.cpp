@@ -51,9 +51,9 @@ float chiStats(int wLen, int bucketCount, std::vector<int> freq, int count) {
 int main(int argc, const char * argv[]) {
 	setlocale(LC_ALL, "Russian");
     srand(time(NULL));
-    int wSize = 20;
-    int exp = 10;
-	std::size_t count = 500000000;
+    int wSize = 32;
+    int exp = 24;
+	std::size_t count = 134217728;
 
 	std::random_device rd;
 	std::mt19937 re(rd());
@@ -62,8 +62,8 @@ int main(int argc, const char * argv[]) {
 
 	//std::mt19937_64 gen { std::random_device()() };
 	//std::uniform_int_distribution<int> uid(0, count);
-
-	
+    
+    std::ofstream file("/Users/Bin/data.txt");
 
 	//std::vector<int> vector(count);
 	//int pos = 0;
@@ -98,25 +98,36 @@ int main(int argc, const char * argv[]) {
     //chi->out();
     
     //----------------------------- THIS IS MOVE TO FRONT -----------------------------
-//    auto mtf = new MoveToFrontList(wSize, exp);
-//        for (int i = 0; i < count; i++) {
-//    auto tmp = new boost::dynamic_bitset<>(wSize, ui(re));
-//    mtf->process(tmp);
-//			if (i % 10000 == 0) std::cout << i << "size is: " << mtf->size() << std::endl;
-//        }
-//    //std::cout << end - now << std::endl;
-//    std::cout << "h2 = " << stats(wSize, exp, MoveToFrontList::cnt, count) << std::endl;
+    auto mtf = new MoveToFrontList(wSize, exp);
+        for (int i = 0; i < count; i++) {
+    auto tmp = new boost::dynamic_bitset<>(wSize, ui(re));
+    mtf->process(tmp);
+			if (i % 10000 == 0) std::cout << i << "size is: " << mtf->size() << std::endl;
+        }
+    //std::cout << end - now << std::endl;
+    std::cout << "h2 = " << stats(wSize, exp, MoveToFrontList::cnt, count) << std::endl;
+    //mtf->out();
     //-----------------------------------------------------------------------------------------
     //----------------------------- THIS IS ORDERED MOVE TO FRONT -----------------------------
-	auto ord = new Ordered(wSize, exp);
-	std::cout << "process started" << std::endl;
-	//int count = (int)pow(2, exp);
-	for (int i = 0; i < count; i++) {
-		auto tmp = std::shared_ptr<std::pair<unsigned long, int>>(new std::pair<unsigned long, int>(ui(re), 0));
-		ord->find(tmp);
-		if (i % 100000 == 0) std::cout << i << "size is: " << ord->hashSet.size() <<  std::endl;
-	}
-      std::cout << "h2 = " << stats(wSize, exp, Ordered::cnt, count) << std::endl;
+//	auto ord = new Ordered(wSize, exp);
+//	std::cout << "process started" << std::endl;
+//	//int count = (int)pow(2, exp);
+//    std::vector<int> counts(16);
+//	for (int i = 0; i < count; i++) {
+//        auto num = ui(re);
+//		auto tmp = std::shared_ptr<std::pair<unsigned long, int>>(new std::pair<unsigned long, int>(num, 0));
+//        //file << num;
+//        //file << "\n";
+//        auto it = counts.begin() + num;
+//        (*it)++;
+//		ord->find(tmp);
+//		if (i % 100000 == 0) std::cout << i << "size is: " << ord->hashSet.size() << "\t" << ord->minFreq << std::endl;
+//	}
+//    ord->outhash();
+//    for (int i = 0; i < 16; i++) {
+//        std::cout << i << "\t" << counts[i] << std::endl;
+//    }
+//      std::cout << "h2 = " << stats(wSize, exp, Ordered::cnt, count) << std::endl;
     //-----------------------------------------------------------------------------------------
 	//getchar();
     return 0;

@@ -72,12 +72,15 @@ public:
 	std::unordered_set<std::list<Key>::iterator, IteratorHash, IteratorEqual> hashSet;
     std::unordered_set<Key, Hasher, Equal> stash;
     int minFreq;
+    int shotchik;
 
 	Ordered(int _wLen, int _exp) : wLen(_wLen), exp(_exp) {
 		this->wLen = _wLen;
 		this->exp = _exp;
 		init();
 		std::cout << "test" << std::endl;
+        this->minFreq = 0;
+        this->shotchik = 1;
 	}
     
 	size_t size() {
@@ -166,8 +169,10 @@ public:
                     stash.insert(std::move(*(--data[i]->end())));
                     data[i]->resize(data[i]->size() - 1);
                     if (data[i]->size()) {
-                        this->minFreq = i - 2;
+                        this->minFreq = i - 1;
+                        this->shotchik = minFreq < 1 ? 1 : minFreq;
                     }
+                    break;
                     return;
                 }
             }
@@ -225,8 +230,10 @@ public:
                     stash.insert(std::move(*(--data[i]->end())));
 					data[i]->resize(data[i]->size() - 1);
                     if (data[i]->size()) {
-                        this->minFreq = i - 2;
+                        this->minFreq = i - 1;
+                        this->shotchik = minFreq < 1 ? 1 : minFreq;
                     }
+                    break;
 					return;
 				}
 			}
