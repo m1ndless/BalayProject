@@ -136,9 +136,19 @@ public:
 			std::cout << (*it)->get()->first << "\t" << (*it)->get()->second << "\t" << (*it)->get() << std::endl;
 		}
 		std::cout << "------------" << std::endl;
+		int totalCount = 0;
+		for (auto &el : hashSet) {
+			totalCount += el->get()->second;
+		}
+
+		for (auto &el : stash) {
+			totalCount += el->second;
+		}
+		std::cout << "total summ is: " << totalCount << std::endl;
 	}
 
 	void find(Key& key) {
+		//std::cout << "Inserting: " << key->first;
 		//std::cout << "////////////////////////////////" << std::endl;
 		//outhash();
         std::list<Key> temp;
@@ -149,16 +159,19 @@ public:
         auto inStash = stash.find(*temp.begin());
         
         if (inStash != std::end(stash)) {
+			//std::cout << "in stash ";
             //std::cout << "НАЙДЕНО В СТЭШЕ!!!!!" <<  std::endl;
             auto freq = inStash->get()->second;
-            
+			//std::cout << " freq was: " << freq;
             if (freq < minFreq) {
                 //std::cout << "не вариант, ибо надо "<< minFreq << ", а есть" << freq << std::endl;
                 inStash->get()->second++;
+				//std::cout << " and now freq is: " << inStash->get()->second << std::endl;
                 return;
             }
             
             auto insert = Key(new std::pair<unsigned long, int>(inStash->get()->first, freq + 1));
+			//std::cout << " and now freq is: " << freq + 1 << std::endl;
             data[freq + 2]->push_front(insert);
             hashSet.insert(data[freq + 2]->begin());
             stash.erase(inStash);
@@ -176,20 +189,23 @@ public:
                     return;
                 }
             }
+			return; 
         }
         
         auto found = hashSet.find(temp.begin());
 
 		if (found != hashSet.end()) {
 			cnt++;
-			//std::cout << "FOUND !! !  " << (*found)->get()->first << "\t" << (*found)->get()->second << "\t" << (*found)->get() << std::endl;
+			//std::cout << "in hashset ";
 			auto insert = Key(new std::pair<unsigned long, int>((*found)->get()->first, (*found)->get()->second + 1));
 			auto freq = (*found)->get()->second;
+			//std::cout << " freq was: " << freq;
 			if (freq > data.size() - 3) {
 				data.push_back(new std::list<Key>());
 			}
 
 			auto toInsert = Key(new std::pair<unsigned long, int>((*found)->get()->first, freq + 1));
+			//std::cout << " and now freq is: " << freq + 1 << std::endl;
 			data[freq + 2]->push_front(toInsert);
 			auto copy = std::list<Key>::iterator(*found);
 			hashSet.erase(copy);
@@ -200,10 +216,11 @@ public:
         
 		//богатая кодировка
         else {
+			//std::cout << "not found ";
             //d::cout << "не встречалось " << std::endl;
             //std::cout << "not found " << temp.begin()->get()->first << "\t" << temp.begin()->get()->second << "\t"  << temp.begin()->get() << std::endl;
             auto freq = temp.begin()->get()->second;
-
+			//std::cout << " freq was: " << freq;
 			if (freq > data.size() - 2) {
 				data.push_back(new std::list<Key>());
 			}
@@ -211,7 +228,7 @@ public:
 
             temp.begin()->get()->second++;
             auto insert = Key(new std::pair<unsigned long, int>(temp.begin()->get()->first, 1));
-            
+			//std::cout << " and now freq is: " << 1 << std::endl;
             if (freq < minFreq) {
                 //data[2]->push_front(insert);
                 stash.insert(insert);
