@@ -147,6 +147,19 @@ public:
 		std::cout << "total summ is: " << totalCount << std::endl;
 	}
 
+	void out() {
+		for (auto it = std::begin(hashSet); it != std::end(hashSet); ++it) {
+			std::cout << (*it)->get()->first << " ";
+		}
+		std::cout << std::endl;
+
+		for (auto it = std::begin(stash); it != std::end(stash); ++it) {
+			std::cout << (*it)->first << " ";
+		}
+		std::cout << std::endl;
+
+	}
+
 	void find(Key& key) {
 		//std::cout << "Inserting: " << key->first;
 		//std::cout << "////////////////////////////////" << std::endl;
@@ -159,7 +172,7 @@ public:
         auto inStash = stash.find(*temp.begin());
         
         if (inStash != std::end(stash)) {
-			//std::cout << "in stash ";
+			std::cout << "in stash " << std::endl;
             //std::cout << "НАЙДЕНО В СТЭШЕ!!!!!" <<  std::endl;
             auto freq = inStash->get()->second;
 			//std::cout << " freq was: " << freq;
@@ -172,22 +185,31 @@ public:
             
             auto insert = Key(new std::pair<unsigned long, int>(inStash->get()->first, freq + 1));
 			//std::cout << " and now freq is: " << freq + 1 << std::endl;
+
+			if (freq > data.size() - 3) {
+				data.push_back(new std::list<Key>());
+			}
+
             data[freq + 2]->push_front(insert);
             hashSet.insert(data[freq + 2]->begin());
             stash.erase(inStash);
             
-            for (int i = 1; i < data.size(); i++) {
+            for (int i = shotchik; i < data.size(); i++) {
                 if (data[i]->size()) {
                     hashSet.erase(--data[i]->end());
                     stash.insert(std::move(*(--data[i]->end())));
                     data[i]->resize(data[i]->size() - 1);
                     if (data[i]->size()) {
-                        this->minFreq = i - 1;
-                        this->shotchik = minFreq < 1 ? 1 : minFreq;
+                        //this->minFreq = i - 1;
+						this->minFreq = shotchik - 2;
+                        //this->shotchik = minFreq < 1 ? 1 : minFreq + 1;
                     }
                     break;
                     return;
                 }
+				else {
+					shotchik++;
+				}
             }
 			return; 
         }
@@ -196,7 +218,7 @@ public:
 
 		if (found != hashSet.end()) {
 			cnt++;
-			//std::cout << "in hashset ";
+			std::cout << "in hashset " << std::endl;
 			auto insert = Key(new std::pair<unsigned long, int>((*found)->get()->first, (*found)->get()->second + 1));
 			auto freq = (*found)->get()->second;
 			//std::cout << " freq was: " << freq;
@@ -241,20 +263,25 @@ public:
 			hashSet.insert(data[2]->begin());
 
             //Удаляем в стэш лишний элемент
-			for (int i = 1; i < data.size(); i++) {
+			for (int i = shotchik; i < data.size(); i++) {
 				if (data[i]->size()) {
 					hashSet.erase(--data[i]->end());
                     stash.insert(std::move(*(--data[i]->end())));
 					data[i]->resize(data[i]->size() - 1);
                     if (data[i]->size()) {
-                        this->minFreq = i - 1;
-                        this->shotchik = minFreq < 1 ? 1 : minFreq;
+                        //this->minFreq = i - 1;
+						this->minFreq = shotchik - 2;
+                        //this->shotchik = minFreq < 1 ? 1 : minFreq + 1;
                     }
                     break;
 					return;
 				}
+				else {
+					shotchik++;
+				}
 			}
         }
+		return;
 		//std::cout << " DATA SIZE IS " << data.size() << std::endl;
   //      for (auto &l : data) {
   //      	std::cout << "size is: " << l->size() << std::endl;
