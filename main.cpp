@@ -17,7 +17,6 @@
 #include "OrderedMoveToFront.h"
 #include "Ordered.h"
 #include <cstdlib>
-#include <Windows.h>
 #include <random>
 #include <algorithm>
 #include "chiSquare.h"
@@ -61,14 +60,14 @@ int main(int argc, const char * argv[]) {
 	std::mt19937 re(rd());
 	std::uniform_int_distribution<unsigned long> ui(0, (unsigned long)pow(2, wSize) - 1);
 
-	const char* path = "C:\\rand.txt";
+	const char* path = "/Users/Bin/testing.txt";
 
 
-	if (remove(path)) {
-		assert("ne udalilosya :(");
-		getchar();
-		return 0;
-	}
+//	if (remove(path)) {
+//		assert("ne udalilosya :(");
+//		getchar();
+//		return 0;
+//	}
 
     std::ofstream file(path);
 
@@ -141,28 +140,30 @@ int main(int argc, const char * argv[]) {
 	unsigned long num = 0;
 	int i = 0;
 	while (infile >> num) {
+        std::cout << "----------------------" << std::endl;
 		i++;
 		auto tmp = std::shared_ptr<std::pair<unsigned long, int>>(new std::pair<unsigned long, int>(num, 0));
+        std::cout << "Вставляем " << num << std::endl;
         //file << num;
         //file << "\n";
         auto it = counts.begin() + num;
         (*it)++;
 		ord->find(tmp);
-		Sleep(10);
 		//std::cout << i << "size is: " << ord->hashSet.size() << "\t" << ord->stash.size() << std::endl;//"\t" << ord->minFreq << "\t" << ord->data[ord->minFreq + 1]->size() << std::endl;
-		if (ord->hashSet.size() > ord->stash.size()) {
-			std::cout << i << std::endl;
-			ord->out();
-		}
-		//if (i % 100000 == 0) 
+		//if (ord->hashSet.size() > ord->stash.size()) {
+		//	std::cout << i << "\t" << num << std::endl;
+        ord->outStack();
+		//}
+		//if (i % 100000 == 0)
+        std::cout << "----------------------" << std::endl;
 	}
-    ord->outhash();
+    //ord->outhash();
     for (int i = 0; i < 16; i++) {
         std::cout << i << "\t" << counts[i] << std::endl;
     }
       std::cout << "h2 = " << stats(wSize, exp, Ordered::cnt, count) << std::endl;
 	  infile.close();
     //-----------------------------------------------------------------------------------------
-	getchar();
+	//getchar();
     return 0;
 }

@@ -80,7 +80,7 @@ public:
 		init();
 		std::cout << "test" << std::endl;
         this->minFreq = 0;
-        this->shotchik = 1;
+        this->shotchik = 0;
 	}
     
 	size_t size() {
@@ -112,10 +112,9 @@ public:
 		data = std::vector<std::list<Key>*>();
 		data.push_back(new std::list<Key>());
 		data.push_back(new std::list<Key>());
-		data.push_back(new std::list<Key>()); //“‡Í Ì‡‰Ó
                 
-		std::copy(std::begin(base_data), std::end(base_data), std::back_inserter(*data[1]));
-		for (auto iter = std::begin(*data[1]); iter != std::end(*data[1]); ++iter) {
+		std::copy(std::begin(base_data), std::end(base_data), std::back_inserter(*data[0]));
+		for (auto iter = std::begin(*data[0]); iter != std::end(*data[0]); ++iter) {
 			hashSet.insert(iter);
 		}
 
@@ -159,6 +158,21 @@ public:
 		std::cout << std::endl;
 
 	}
+            
+    void outStack() {
+        for(int i = 0; i < data.size(); i++) {
+            if (data.size() != 0) {
+                std::cout << "+++++++++++++++++++++" << std::endl;
+                std::cout << "FREQ = " << i << std::endl;
+                for(auto it = data[i]->begin(); it != data[i]->end(); ++it) { 
+                    std::cout << (*it).get()->first << std::endl;
+                }
+            }
+            else {
+                continue;
+            }
+        }
+    }
 
 	void find(Key& key) {
 		//std::cout << "Inserting: " << key->first;
@@ -186,12 +200,12 @@ public:
             auto insert = Key(new std::pair<unsigned long, int>(inStash->get()->first, freq + 1));
 			//std::cout << " and now freq is: " << freq + 1 << std::endl;
 
-			if (freq > data.size() - 3) {
+			if (freq == data.size() - 1) {
 				data.push_back(new std::list<Key>());
 			}
 
-            data[freq + 2]->push_front(insert);
-            hashSet.insert(data[freq + 2]->begin());
+            data[freq + 1]->push_front(insert);
+            hashSet.insert(data[freq + 1]->begin());
             stash.erase(inStash);
             
             for (int i = shotchik; i < data.size(); i++) {
@@ -200,9 +214,7 @@ public:
                     stash.insert(std::move(*(--data[i]->end())));
                     data[i]->resize(data[i]->size() - 1);
                     if (data[i]->size()) {
-                        //this->minFreq = i - 1;
-						this->minFreq = shotchik - 2;
-                        //this->shotchik = minFreq < 1 ? 1 : minFreq + 1;
+						this->minFreq = shotchik - 1;
                     }
                     break;
                     return;
@@ -222,23 +234,23 @@ public:
 			auto insert = Key(new std::pair<unsigned long, int>((*found)->get()->first, (*found)->get()->second + 1));
 			auto freq = (*found)->get()->second;
 			//std::cout << " freq was: " << freq;
-			if (freq > data.size() - 3) {
+			if (freq == data.size() - 1) {
 				data.push_back(new std::list<Key>());
 			}
 
 			auto toInsert = Key(new std::pair<unsigned long, int>((*found)->get()->first, freq + 1));
 			//std::cout << " and now freq is: " << freq + 1 << std::endl;
-			data[freq + 2]->push_front(toInsert);
+			data[freq + 1]->push_front(toInsert);
 			auto copy = std::list<Key>::iterator(*found);
 			hashSet.erase(copy);
-			data[freq + 1]->erase(copy);
-			hashSet.insert(data[freq + 2]->begin());
+			data[freq]->erase(copy);
+			hashSet.insert(data[freq + 1]->begin());
 			return;
 		}
         
 		//богатая кодировка
         else {
-			//std::cout << "not found ";
+			std::cout << "not found ";
             //d::cout << "не встречалось " << std::endl;
             //std::cout << "not found " << temp.begin()->get()->first << "\t" << temp.begin()->get()->second << "\t"  << temp.begin()->get() << std::endl;
             auto freq = temp.begin()->get()->second;
@@ -259,8 +271,8 @@ public:
             }
             
             
-            data[2]->push_front(insert);
-			hashSet.insert(data[2]->begin());
+            data[1]->push_front(insert);
+			hashSet.insert(data[1]->begin());
 
             //Удаляем в стэш лишний элемент
 			for (int i = shotchik; i < data.size(); i++) {
@@ -270,7 +282,7 @@ public:
 					data[i]->resize(data[i]->size() - 1);
                     if (data[i]->size()) {
                         //this->minFreq = i - 1;
-						this->minFreq = shotchik - 2;
+						this->minFreq = shotchik - 1;
                         //this->shotchik = minFreq < 1 ? 1 : minFreq + 1;
                     }
                     break;
