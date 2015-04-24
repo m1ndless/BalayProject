@@ -24,6 +24,7 @@
 
 class ChiSquare {
     size_t wLength;
+    size_t exp;
     unsigned int bucketCount;
     
 	typedef std::pair<unsigned long, int> Key;
@@ -48,20 +49,20 @@ public:
 	std::vector<int> *frenqInBuckets;
 	std::unordered_set<std::pair<unsigned long, int>, KeyHash, KeyEqual> data;
 
-    ChiSquare(size_t _wLength, unsigned int _bucketCount) : wLength(_wLength), bucketCount(_bucketCount ) {
+    ChiSquare(size_t _wLength, size_t _exp, unsigned int _bucketCount) : wLength(_wLength), exp(_exp), bucketCount(_bucketCount ) {
         frenqInBuckets = new std::vector<int>(bucketCount);
         bucketLimits = new std::vector<unsigned long>();
 		init();
         calculateLimits(this->wLength, this->bucketCount);
     }
 
-	void init() {
+	void init() { //OK
 		std::random_device rd;
 		std::mt19937 re(rd());
 		std::uniform_int_distribution<unsigned long> ui(0, (unsigned long)pow(2, wLength) - 1);
 
 		int i = 0;
-		while (data.size() != (size_t)pow(2, wLength)) {
+		while (data.size() != (size_t)pow(2, exp)) {
 			auto pair = data.insert(std::pair<unsigned long, int>(ui(re), i));
 			if (pair.second) i++;
             if (data.size() % 10000 == 0) std::cout << "size is: " <<  data.size() << std::endl;
@@ -69,14 +70,8 @@ public:
 	}
     
     void calculateLimits(size_t wLength, int bucketCount) {
-        /*unsigned long countInSingleBucket = (pow(2, wLength) / bucketCount);
-        unsigned long first = countInSingleBucket - 1;
-        for (int i = 1; i <= bucketCount; i++) {
-            bucketLimits->push_back(boost::dynamic_bitset<>(this->wLength, first));
-            first += countInSingleBucket;
-        }*/
 
-		unsigned long inBucket = (size_t)pow(2, wLength) / this->bucketCount;
+		unsigned long inBucket = (size_t)pow(2, exp) / this->bucketCount;
 		unsigned long first = inBucket - 1;
 
 		for (int i = 1; i <= bucketCount; i++, first += inBucket) {
@@ -90,34 +85,29 @@ public:
     }
     
     void out() {
-        //for (auto it : *frenqInBuckets) {
-        //    std::cout << it << std::endl;
-        //}
-        //    std::cout << "----------" << std::endl;
-        //    for (auto it : *bucketLimits) {
-        //        std::cout << it.to_ulong() << std::endl;
-        //    }
+        for (auto it : *frenqInBuckets) {
+            std::cout << it << std::endl;
+        }
     }
     
     void search(unsigned long val) {
 
 		Key key = Key(val, 0);
-        //int i = 0;
-        //for (auto it = bucketLimits->begin(); it != bucketLimits->end(); ++it, i++) {
-        //    if (bs <= *it) {
-        //        (*(frenqInBuckets->begin() + i))++;
-        //        return;
-        //    }
-        //}
-
 		int i = 0;
-		auto index = data.find(key)->second; //found an index
-		//std::cout << "index is" << index << std::endl;
-		for (auto it = bucketLimits->begin(); it != bucketLimits->end(); ++it, i++) {
-			if (index < *it) { (*(frenqInBuckets->begin() + i))++;
-				//std::cout << "inserting into: " << i << std::endl
-				break;
-			}
-		}
+        
+        auto found = data.find(key);
+        
+        if (found != data.end()) {
+		auto index = data.find(key)->second;
+            for (auto it = bucketLimits->begin(); it != bucketLimits->end(); ++it, i++) {
+                if (index <= *it) { (*(frenqInBuckets->begin() + i))++;
+                    break;
+                }
+            }
+        }
+        
+        else {
+            return;
+        }
     }
 };

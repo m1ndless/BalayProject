@@ -52,9 +52,10 @@ float chiStats(int wLen, int bucketCount, std::vector<int> freq, int count) {
 int main(int argc, const char * argv[]) {
 	setlocale(LC_ALL, "Russian");
     srand(time(NULL));
+    int bucketCount = 4;
     int wSize = 4;
     int exp = 3;
-	std::size_t count = 10000;
+	std::size_t count = 178956970;
 
 	std::random_device rd;
 	std::mt19937 re(rd());
@@ -69,48 +70,27 @@ int main(int argc, const char * argv[]) {
 //		return 0;
 //	}
 
-    std::ofstream file(path);
+//    std::ofstream file(path);
+//
+//	for (int i = 0; i < count; i++) {
+//		file << ui(rd);
+//		file << "\n";
+//	}
 
-	for (int i = 0; i < count; i++) {
-		file << ui(rd);
-		file << "\n";
-	}
-
-	file.close();
+	//file.close();
 
 	std::ifstream infile(path);
 
-	//std::vector<int> vector(count);
-	//int pos = 0;
-	//do {
-	//	std::generate(vector.begin(), vector.end(), [&uid, &gen]() -> int { return uid(gen); });
-	//	auto it = std::unique(vector.begin() + pos, vector.end());
-	//	vector.resize(std::distance(std::begin(vector), it));
-	//	pos = vector.size();
-	//	std::cout << pos << std::endl;
-	//	vector.resize(count);	
-	//} while (pos != count);
- //   
-    //FileReader f("/Users/Bin/Novosib.txt");
-    //std::cout << f.filesize() << std::endl;
-//    bool a = false;
+    auto chiSquare = new ChiSquare(wSize, exp, bucketCount);
+    int i = 0;
+    unsigned long num;
     
-//    auto var = f.readNext(a);
-
-    //var->test();
-//
-//    std::cout << (unsigned long)pow(2, 46) << std::endl;
-    
-//    auto chi = new ChiSquare(wSize, 2);
-//    
-//    for (int i = 0; i < count; i++) {
-//        //auto bs = var->test();
-//		if (i % 10000 == 0) std::cout << i << std::endl;
-//        chi->search(ui(re));
-//    }
-//	std::cout << chiStats(wSize, 4, *chi->frenqInBuckets, count) << std::endl;
-    
-    //chi->out();
+    while (infile >> num) {
+        i++;
+        chiSquare->search(num);
+    }
+    std::cout << "i: " << i << std::endl;
+    chiSquare->out();
     
     //----------------------------- THIS IS MOVE TO FRONT -----------------------------
 	//unsigned long num;
@@ -132,37 +112,20 @@ int main(int argc, const char * argv[]) {
     //-----------------------------------------------------------------------------------------
     //----------------------------- THIS IS ORDERED MOVE TO FRONT -----------------------------
 	//infile.open(path);
-	auto ord = new Ordered(wSize, exp);
-	std::cout << "process started" << std::endl;
-	//int count = (int)pow(2, exp);
-    std::vector<int> counts(16);
-	//for (int i = 0; i < count; i++) {
-	unsigned long num = 0;
-	int i = 0;
-	while (infile >> num) {
-        std::cout << "----------------------" << std::endl;
-		i++;
-		auto tmp = std::shared_ptr<std::pair<unsigned long, int>>(new std::pair<unsigned long, int>(num, 0));
-        std::cout << "Вставляем " << num << std::endl;
-        //file << num;
-        //file << "\n";
-        auto it = counts.begin() + num;
-        (*it)++;
-		ord->find(tmp);
-		//std::cout << i << "size is: " << ord->hashSet.size() << "\t" << ord->stash.size() << std::endl;//"\t" << ord->minFreq << "\t" << ord->data[ord->minFreq + 1]->size() << std::endl;
-		//if (ord->hashSet.size() > ord->stash.size()) {
-		//	std::cout << i << "\t" << num << std::endl;
-        ord->outStack();
-		//}
-		//if (i % 100000 == 0)
-        std::cout << "----------------------" << std::endl;
-	}
-    //ord->outhash();
-    for (int i = 0; i < 16; i++) {
-        std::cout << i << "\t" << counts[i] << std::endl;
-    }
-      std::cout << "h2 = " << stats(wSize, exp, Ordered::cnt, count) << std::endl;
-	  infile.close();
+//	auto ord = new Ordered(wSize, exp);
+//	std::cout << "process started" << std::endl;
+//	unsigned long num = 0;
+//	int i = 0;
+//	while (infile >> num) {
+//		i++;
+//		auto tmp = std::shared_ptr<std::pair<unsigned long, int>>(new std::pair<unsigned long, int>(num, 0));
+//		ord->find(tmp);
+//        if (i % 100000 == 0) {
+//            std::cout << i << "size is: " << ord->hashSet.size() << "\t" << ord->stash.size() << std::endl;
+//        }
+//	}
+//      std::cout << "h2 = " << stats(wSize, exp, Ordered::cnt, count) << std::endl;
+//	  infile.close();
     //-----------------------------------------------------------------------------------------
 	//getchar();
     return 0;

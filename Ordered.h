@@ -37,14 +37,14 @@ public:
 
 	struct Equal {
 		bool operator()(const Key& lhs, const Key& rhs) const {
-			return lhs->first == rhs->first;
+			return lhs.get()->first == rhs.get()->first;
 		}
 	};
 
 	struct Hasher {
 		size_t operator()(const Key &it) const {
 			std::hash<unsigned long> hash_fn;
-			return hash_fn(it->first);
+			return hash_fn(it.get()->first);
 		}
 	};
 
@@ -108,7 +108,6 @@ public:
             assert("nelza");
         }
 
-
 		data = std::vector<std::list<Key>*>();
 		data.push_back(new std::list<Key>());
 		data.push_back(new std::list<Key>());
@@ -117,17 +116,6 @@ public:
 		for (auto iter = std::begin(*data[0]); iter != std::end(*data[0]); ++iter) {
 			hashSet.insert(iter);
 		}
-
-		//it = std::find(std::begin(data[0]), std::end(data[0]), kostil);
-        
-//        for (auto &l : data) {
-//            std::cout << "freq is: " << std::endl;
-//            for (auto &el : *l) {
-//                std::cout << el->first << "\t" << el->second << "\t" << el << std::endl;
-//            }
-//            std::cout << "------------" << std::endl;
-//        }
-        
 	}
 
 	void outhash() {
@@ -161,7 +149,7 @@ public:
             
     void outStack() {
         for(int i = 0; i < data.size(); i++) {
-            if (data.size() != 0) {
+            if (data[i]->size() != 0) {
                 std::cout << "+++++++++++++++++++++" << std::endl;
                 std::cout << "FREQ = " << i << std::endl;
                 for(auto it = data[i]->begin(); it != data[i]->end(); ++it) { 
@@ -172,33 +160,26 @@ public:
                 continue;
             }
         }
+        std::cout << "stash is: ";
+        for(auto it = stash.begin(); it != stash.end(); ++it) {
+            std::cout << "{" << (*it)->first << "," << (*it)->second << "}";
+        }
+        std::cout << std::endl;
     }
 
 	void find(Key& key) {
-		//std::cout << "Inserting: " << key->first;
-		//std::cout << "////////////////////////////////" << std::endl;
-		//outhash();
         std::list<Key> temp;
         temp.push_front(key);
-        
-        //std::cout << temp.begin()->get()->first << "\t" << temp.begin()->get()->second << std::endl;
-        
         auto inStash = stash.find(*temp.begin());
         
         if (inStash != std::end(stash)) {
-			std::cout << "in stash " << std::endl;
-            //std::cout << "НАЙДЕНО В СТЭШЕ!!!!!" <<  std::endl;
             auto freq = inStash->get()->second;
-			//std::cout << " freq was: " << freq;
             if (freq < minFreq) {
-                //std::cout << "не вариант, ибо надо "<< minFreq << ", а есть" << freq << std::endl;
                 inStash->get()->second++;
-				//std::cout << " and now freq is: " << inStash->get()->second << std::endl;
                 return;
             }
             
             auto insert = Key(new std::pair<unsigned long, int>(inStash->get()->first, freq + 1));
-			//std::cout << " and now freq is: " << freq + 1 << std::endl;
 
 			if (freq == data.size() - 1) {
 				data.push_back(new std::list<Key>());
@@ -214,7 +195,7 @@ public:
                     stash.insert(std::move(*(--data[i]->end())));
                     data[i]->resize(data[i]->size() - 1);
                     if (data[i]->size()) {
-						this->minFreq = shotchik - 1;
+						this->minFreq = shotchik;
                     }
                     break;
                     return;
@@ -230,31 +211,24 @@ public:
 
 		if (found != hashSet.end()) {
 			cnt++;
-			std::cout << "in hashset " << std::endl;
 			auto insert = Key(new std::pair<unsigned long, int>((*found)->get()->first, (*found)->get()->second + 1));
 			auto freq = (*found)->get()->second;
-			//std::cout << " freq was: " << freq;
 			if (freq == data.size() - 1) {
 				data.push_back(new std::list<Key>());
 			}
 
 			auto toInsert = Key(new std::pair<unsigned long, int>((*found)->get()->first, freq + 1));
-			//std::cout << " and now freq is: " << freq + 1 << std::endl;
 			data[freq + 1]->push_front(toInsert);
 			auto copy = std::list<Key>::iterator(*found);
 			hashSet.erase(copy);
 			data[freq]->erase(copy);
+            if (!data[minFreq]->size()) minFreq++;
 			hashSet.insert(data[freq + 1]->begin());
 			return;
 		}
         
-		//богатая кодировка
         else {
-			std::cout << "not found ";
-            //d::cout << "не встречалось " << std::endl;
-            //std::cout << "not found " << temp.begin()->get()->first << "\t" << temp.begin()->get()->second << "\t"  << temp.begin()->get() << std::endl;
             auto freq = temp.begin()->get()->second;
-			//std::cout << " freq was: " << freq;
 			if (freq > data.size() - 2) {
 				data.push_back(new std::list<Key>());
 			}
@@ -262,11 +236,9 @@ public:
 
             temp.begin()->get()->second++;
             auto insert = Key(new std::pair<unsigned long, int>(temp.begin()->get()->first, 1));
-			//std::cout << " and now freq is: " << 1 << std::endl;
-            if (freq < minFreq) {
-                //data[2]->push_front(insert);
+
+            if (minFreq) {
                 stash.insert(insert);
-                //data[2]->erase(data[2]->begin());
                 return;
             }
             
@@ -281,9 +253,7 @@ public:
                     stash.insert(std::move(*(--data[i]->end())));
 					data[i]->resize(data[i]->size() - 1);
                     if (data[i]->size()) {
-                        //this->minFreq = i - 1;
-						this->minFreq = shotchik - 1;
-                        //this->shotchik = minFreq < 1 ? 1 : minFreq + 1;
+						this->minFreq = shotchik;
                     }
                     break;
 					return;
@@ -294,15 +264,6 @@ public:
 			}
         }
 		return;
-		//std::cout << " DATA SIZE IS " << data.size() << std::endl;
-  //      for (auto &l : data) {
-  //      	std::cout << "size is: " << l->size() << std::endl;
-  //      	for (auto &el : *l) {
-  //      		std::cout << el->first << "\t" << el->second << "\t" << el << std::endl;
-  //      	}
-  //      	std::cout << "------------" << std::endl;
-  //      }
-		//std::cout << "////////////////////////////////" << std::endl;
-        //outhash();
+
 	}
 };
