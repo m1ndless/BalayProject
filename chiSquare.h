@@ -65,9 +65,13 @@ public:
 		while (data.size() != (size_t)pow(2, exp)) {
 			auto pair = data.insert(std::pair<unsigned long, int>(ui(re), i));
 			if (pair.second) i++;
-            if (data.size() % 10000 == 0) std::cout << "size is: " <<  data.size() << std::endl;
 		}
 	}
+    
+    ~ChiSquare() {
+        delete frenqInBuckets;
+        delete bucketLimits;
+    }
     
     void calculateLimits(size_t wLength, int bucketCount) {
 
@@ -77,11 +81,6 @@ public:
 		for (int i = 1; i <= bucketCount; i++, first += inBucket) {
 			bucketLimits->push_back(first);
 		}
-
-		for (auto it = bucketLimits->begin(); it != bucketLimits->end(); ++it) {
-			std::cout << *it << std::endl;
-		}
-
     }
     
     void out() {

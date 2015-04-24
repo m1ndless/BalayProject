@@ -78,11 +78,11 @@ public:
 		this->wLen = _wLen;
 		this->exp = _exp;
 		init();
-		std::cout << "test" << std::endl;
+		//std::cout << "test" << std::endl;
         this->minFreq = 0;
         this->shotchik = 0;
 	}
-    
+        
 	size_t size() {
 		auto result = 0;
 		for (int i = 1; i < data.size(); i++) {
@@ -117,6 +117,10 @@ public:
 			hashSet.insert(iter);
 		}
 	}
+    
+    ~Ordered() {
+        
+    }
 
 	void outhash() {
 		for (auto it = std::begin(hashSet); it != std::end(hashSet); ++it) {
