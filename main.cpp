@@ -19,7 +19,9 @@
 #include <cstdlib>
 #include <random>
 #include <algorithm>
+#include "sobaka.h"
 #include "chiSquare.h"
+#include "Utils.h"
 
 int MoveToFrontList::cnt = 0;
 int Ordered::cnt = 0;
@@ -31,6 +33,7 @@ float stats(int wLen, int exp, int cnt, int n) {
 	
 	auto tmp1 = ((cnt - n*p)*(cnt - n*p)) / (n*p);
 	auto tmp2 = ((n - cnt) - n*(1 - p))*((n - cnt) - n*(1 - p)) / (n*(1 - p));
+    std::cout << "x^2 is: " << tmp1 + tmp2 << std::endl;
 	return tmp1 + tmp2;
 }
 
@@ -46,26 +49,35 @@ float chiStats(int wLen, int bucketCount, std::vector<int> freq, int count) {
 	return result;
 }
 
-int testingFucntion(const char* path, int wSize, int exp, int count, bool type) {
+int testingFucntion(const char* path, int wSize, int exp, int count, bool type, int cycles) {
     
-    std::random_device rd;
+    //std::random_device rd;
     //std::mt19937 re(rd());
-    if (type) {
-        std::mt19937 re(rd());
-    }
-    
-    else {
-        std::minstd_rand re(rd());
-    }
+//    if (type) {
+//        std::mt19937 re(rd());
+//    }
+//    
+//    else {
+//        std::minstd_rand re(rd());
+//    }
     
     std::uniform_int_distribution<unsigned long> ui(0, (unsigned long)pow(2, wSize) - 1);
     
-    for (int c = 0; c < 10; c++) {
-        std::cout << "TESTING CYCLE " << c + 1 << std::endl;
+    float chiP = 0;
+    float stackP = 0;
+    float orderedP = 0;
+    
+    for (int sh = 0; sh < cycles; sh++) {
+        std::cout << "TESTING CYCLE " << sh + 1 << std::endl;
         
         std::ofstream file(path);
         for (int i = 0; i < count; i++) {
-            file << ui(rd);
+            unsigned long num = rand();
+            num >>= (31 - wSize);
+            //std::cout << "STALO " <<  num << std::endl;
+            
+            file << num;
+            //file << ui(rd);
             file << "\n";
         }
         file.close();
@@ -74,7 +86,7 @@ int testingFucntion(const char* path, int wSize, int exp, int count, bool type) 
         std::ifstream infile(path);
         //----------------------------- THIS IS CHI SQUARE -----------------------------
         {
-            auto chiSquare = new ChiSquare(wSize, exp, 4);
+            auto chiSquare = new ChiSquare(wSize, exp, 1);
             int i = 0;
             unsigned long num;
             while (infile >> num) {
@@ -86,9 +98,11 @@ int testingFucntion(const char* path, int wSize, int exp, int count, bool type) 
                 tatol += *it;
             }
             std::cout << "chi" << std::endl;
-            std::cout << "h2 = " << stats(wSize, exp, tatol, count) << std::endl;
+            chiP += stats(wSize, exp, tatol, count);
+            //std::cout << "h2 = " << stats(wSize, exp, tatol, count) << std::endl;
             std::cout << "******************************" << std::endl;
             infile.close();
+            chiSquare->out();
         }
         
         //----------------------------- THIS IS MOVE TO FRONT -----------------------------
@@ -104,7 +118,8 @@ int testingFucntion(const char* path, int wSize, int exp, int count, bool type) 
                 //if (i % 100000 == 0) std::cout << i << "size is: " << mtf->size() << std::endl;
             }
             std::cout << "bookStack" << std::endl;
-            std::cout << "h2 = " << stats(wSize, exp, MoveToFrontList::cnt, count) << std::endl;
+            stackP += stats(wSize, exp, MoveToFrontList::cnt, count);
+            //std::cout << "h2 = " << stats(wSize, exp, MoveToFrontList::cnt, count) << std::endl;
             std::cout << "******************************" << std::endl;
             infile.close();
             MoveToFrontList::cnt = 0;
@@ -124,7 +139,8 @@ int testingFucntion(const char* path, int wSize, int exp, int count, bool type) 
             }
         }
         std::cout << "Ordered" << std::endl;
-        std::cout << "h2 = " << stats(wSize, exp, Ordered::cnt, count) << std::endl;
+        orderedP += stats(wSize, exp, Ordered::cnt, count);
+        //std::cout << "h2 = " << stats(wSize, exp, Ordered::cnt, count) << std::endl;
         infile.close();
         std::cout << "******************************" << std::endl;
         Ordered::cnt = 0;
@@ -138,26 +154,44 @@ int testingFucntion(const char* path, int wSize, int exp, int count, bool type) 
         
         
     }
+    std::cout << "chi: " << chiP / cycles << "\t" << "stackP: " << stackP / cycles << "\t" << "orderedP: " << orderedP / cycles << std::endl;
     return 0;
 }
 
 int main(int argc, const char * argv[]) {
 	setlocale(LC_ALL, "Russian");
     srand(time(NULL));
-    int wSize = 4;
-    int exp = 3;
-	std::size_t count = 100000;
+    int wSize = 16;
+    int exp = 12;
+	std::size_t count = 1000000;
+    int cycles = 10;
 	const char* path = "/Users/Bin/testing.txt";
 
-    auto var = testingFucntion(path, wSize, exp, count, true);
-
-
-
-
+    //auto var = testingFucntion(path, wSize, exp, count, false, cycles);
+    
+    
+    //auto chars = utils::ulongToChar(1);
+    
+    //std::cout << chars << std::endl;
+    
+    
+    unsigned int ct[4], pt[4];
+    pt[0] = 0x00000000;
+    pt[1] = 0x00000000;
+    pt[2] = 0x00000000;
+    pt[3] = 0xFFFFFFFF;
+    auto test = utils::ulongToCharArray(0);
+    utils::rc6_key_setup(reinterpret_cast<unsigned char*>(test), 32);
+    utils::rc6_block_encrypt(pt, ct);
+    printf("%08x %08x %08x %08x \n", ct[0], ct[1], ct[2], ct[3]);
+    for (int i = 0; i < 4; i++) {
+        std::cout << ct[i] << std::endl;
+    }
+//
 	//file.close();
     
 
     //-----------------------------------------------------------------------------------------
-    getchar();
+    //getchar();
 }
 
