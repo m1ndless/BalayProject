@@ -20,7 +20,7 @@
 namespace utils {
 
 #define w 32    /* word size in bits */
-#define r 1     /* based on security estimates */
+#define r 30     /* based on security estimates */
 
 #define P32 0xB7E15163  /* Magic constants for key setup */
 #define Q32 0x9E3779B9
@@ -158,9 +158,6 @@ struct test_struct
         result[2] = (value >> 16) & 0xFF;
         result[3] = (value >> 24) & 0xFF;
         
-        for (int i = 0; i < 32; i++) {
-            std::cout << result[i];
-        }
         
         return result;
     }

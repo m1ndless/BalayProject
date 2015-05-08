@@ -6,6 +6,9 @@
 //  Copyright (c) 2015 Denis Genalitskiy. All rights reserved.
 //
 
+
+#define _CRT_SECURE_NO_WARNINGS
+
 #include <iostream>
 #include <bitset>
 #include <math.h>
@@ -67,20 +70,20 @@ int testingFucntion(const char* path, int wSize, int exp, int count, bool type, 
     float stackP = 0;
     float orderedP = 0;
     
-    for (int sh = 0; sh < cycles; sh++) {
-        std::cout << "TESTING CYCLE " << sh + 1 << std::endl;
+   // for (int sh = 0; sh < cycles; sh++) {
+       // std::cout << "TESTING CYCLE " << sh + 1 << std::endl;
         
-        std::ofstream file(path);
-        for (int i = 0; i < count; i++) {
-            unsigned long num = rand();
-            num >>= (31 - wSize);
-            //std::cout << "STALO " <<  num << std::endl;
-            
-            file << num;
-            //file << ui(rd);
-            file << "\n";
-        }
-        file.close();
+        //std::ofstream file(path);
+        //for (int i = 0; i < count; i++) {
+        //    unsigned long num = rand();
+        //    num >>= (31 - wSize);
+        //    //std::cout << "STALO " <<  num << std::endl;
+        //    
+        //    file << num;
+        //    //file << ui(rd);
+        //    file << "\n";
+        //}
+        //file.close();
         
         
         std::ifstream infile(path);
@@ -146,52 +149,84 @@ int testingFucntion(const char* path, int wSize, int exp, int count, bool type, 
         Ordered::cnt = 0;
         std::cout << "-----------------------------------------------------------------------------------------" << std::endl;
         
-        if (remove(path)) {
-            assert("ne udalilosya :(");
-            getchar();
-            return 0;
-        }
+        //if (remove(path)) {
+        //    assert("ne udalilosya :(");
+        //    getchar();
+        //    return 0;
+        //}
         
         
-    }
+    //}
     std::cout << "chi: " << chiP / cycles << "\t" << "stackP: " << stackP / cycles << "\t" << "orderedP: " << orderedP / cycles << std::endl;
     return 0;
 }
 
+void encryptSequence(int from, int to, unsigned long _key, const char* path) {
+	
+	std::ofstream file(path);
+	//auto key = utils::ulongToCharArray(_key);
+	unsigned char key[32] = { 0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef,
+		0x01, 0x12, 0x23, 0x34, 0x45, 0x56, 0x67, 0x78,
+		0x89, 0x9a, 0xab, 0xbc, 0xcd, 0xde, 0xef, 0xf0,
+		0x10, 0x32, 0x54, 0x76, 0x98, 0xba, 0xdc, 0xfe };
+
+	for (int i = from; i < to; i++) {
+		unsigned int ct[4], pt[4];
+		pt[0] = pt[1] = pt[2] = 0x00000000;
+		pt[3] = i;
+		//utils::rc6_key_setup(reinterpret_cast<unsigned char*>(key), 32);
+		utils::rc6_key_setup(key, 32);
+		utils::rc6_block_encrypt(pt, ct);
+		for (int i = 0; i < 4; i++) {
+			file << ct[i] << "\n";
+		}
+		//printf("%08x %08x %08x %08x \n", ct[0], ct[1], ct[2], ct[3]);
+	}
+	
+
+	
+}
+
+
+
 int main(int argc, const char * argv[]) {
 	setlocale(LC_ALL, "Russian");
     srand(time(NULL));
-    int wSize = 16;
-    int exp = 12;
+    int wSize = 32;
+    int exp = 20;
 	std::size_t count = 1000000;
     int cycles = 10;
-	const char* path = "/Users/Bin/testing.txt";
+	const char* path = "C:\\encrypt.txt";
 
-    //auto var = testingFucntion(path, wSize, exp, count, false, cycles);
+    
     
     
     //auto chars = utils::ulongToChar(1);
     
     //std::cout << chars << std::endl;
     
+	remove(path);
+	encryptSequence(0, (int)pow(2, 18) - 1, 0, path);
+	auto var = testingFucntion(path, wSize, exp, count, false, cycles);
+
     
-    unsigned int ct[4], pt[4];
-    pt[0] = 0x00000000;
-    pt[1] = 0x00000000;
-    pt[2] = 0x00000000;
-    pt[3] = 0xFFFFFFFF;
-    auto test = utils::ulongToCharArray(0);
-    utils::rc6_key_setup(reinterpret_cast<unsigned char*>(test), 32);
-    utils::rc6_block_encrypt(pt, ct);
-    printf("%08x %08x %08x %08x \n", ct[0], ct[1], ct[2], ct[3]);
-    for (int i = 0; i < 4; i++) {
-        std::cout << ct[i] << std::endl;
-    }
+    //unsigned int ct[4], pt[4];
+    //pt[0] = 0x00000000;
+    //pt[1] = 0x00000000;
+    //pt[2] = 0x00000000;
+    //pt[3] = 0x00000001;
+    //auto test = utils::ulongToCharArray(0);
+    //utils::rc6_key_setup(reinterpret_cast<unsigned char*>(test), 32);
+    //utils::rc6_block_encrypt(pt, ct);
+    //printf("%08x %08x %08x %08x \n", ct[0], ct[1], ct[2], ct[3]);
+    //for (int i = 0; i < 4; i++) {
+    //    std::cout << ct[i] << std::endl;
+    //}
 //
 	//file.close();
     
-
+	std::cout << "gotovo" << std::endl;
     //-----------------------------------------------------------------------------------------
-    //getchar();
+    getchar();
 }
 

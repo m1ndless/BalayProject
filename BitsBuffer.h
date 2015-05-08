@@ -40,7 +40,7 @@ private:
         int z;
         for (z = (int)pow(2, len - 1); z > 0; z >>= 1)
         {
-            strcat(b, ((x & z) == z) ? "1" : "0");
+            strcat_s(b, ((x & z) == z) ? "1" : "0");
         }
         
         return b;

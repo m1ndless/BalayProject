@@ -122,7 +122,7 @@ public:
                 auto tmp = new boost::dynamic_bitset<>(wLength, ui(re));
 				auto pair = base_data.insert(Key(tmp));
                 if (pair.second == 0) delete tmp;
-                if (base_data.size() % 10000 == 0) std::cout << "current size is: " << base_data.size() << std::endl;
+                //if (base_data.size() % 10000 == 0) std::cout << "current size is: " << base_data.size() << std::endl;
 			}
 		}
 		std::move(std::begin(base_data), std::end(base_data), std::back_inserter(bookStack));
