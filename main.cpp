@@ -8,7 +8,7 @@
 
 
 #define _CRT_SECURE_NO_WARNINGS
-
+#include <limits>
 #include <iostream>
 #include <bitset>
 #include <math.h>
@@ -23,11 +23,15 @@
 #include <random>
 #include <algorithm>
 #include "sobaka.h"
+#include "LongToBitsetConverter.h"
 #include "chiSquare.h"
 #include "Utils.h"
+//#include <des.h>
 
 int MoveToFrontList::cnt = 0;
 int Ordered::cnt = 0;
+
+
 
 float stats(int wLen, int exp, int cnt, int n) {
 	float p = 1 / pow(2, wLen - exp);
@@ -38,6 +42,46 @@ float stats(int wLen, int exp, int cnt, int n) {
 	auto tmp2 = ((n - cnt) - n*(1 - p))*((n - cnt) - n*(1 - p)) / (n*(1 - p));
     std::cout << "x^2 is: " << tmp1 + tmp2 << std::endl;
 	return tmp1 + tmp2;
+}
+
+void encryptSequence(int from, int to, unsigned long _key, const char* path) {
+    
+    std::ofstream file(path);
+    //auto key = utils::ulongToCharArray(_key);
+    //	unsigned char key[32] = { 0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef,
+    //		0x01, 0x12, 0x23, 0x34, 0x45, 0x56, 0x67, 0x78,
+    //		0x89, 0x9a, 0xab, 0xbc, 0xcd, 0xde, 0xef, 0xf0,
+    //		0x10, 0x32, 0x54, 0x76, 0x98, 0xba, 0xdc, 0xfe };
+    
+    unsigned char key[16];
+    
+    for (int i = 0; i < 16; i++) {
+        key[i] = rand() % 256;
+        //key[i] = 0;
+    }
+    
+    //for (int i = from; i < to; i++) {
+    for (int i = from; i < to; i += 4) {
+        unsigned int ct[4], pt[4];
+        //pt[0] = pt[1] = pt[2] = 0;
+        pt[0] = i;
+        pt[1] = i + 1;
+        pt[2] = i + 2;
+        pt[3] = i + 3;
+        utils::rc6_key_setup(key, 16);
+        utils::rc6_block_encrypt(pt, ct);
+        for (int i = 0; i < 4; i++) {
+            file << ct[i] << "\n";
+        }
+    }
+}
+
+void outDataToBinary(int from, int to, const char* path) {
+    std::ofstream file(path, std::ios::binary);
+    for (int i = from; i < to; i++) {
+        file.write(reinterpret_cast<const char*>(&i), sizeof(i));
+    }
+    file.close();
 }
 
 float chiStats(int wLen, int bucketCount, std::vector<int> freq, int count) {
@@ -70,9 +114,12 @@ int testingFucntion(const char* path, int wSize, int exp, int count, bool type, 
     float stackP = 0;
     float orderedP = 0;
     
-   // for (int sh = 0; sh < cycles; sh++) {
-       // std::cout << "TESTING CYCLE " << sh + 1 << std::endl;
+    for (int sh = 0; sh < cycles; sh++) {
+        std::cout << "TESTING CYCLE " << sh + 1 << std::endl;
         
+        if (sh == 0) {
+            chiP = stackP = orderedP = 0;
+        }
         //std::ofstream file(path);
         //for (int i = 0; i < count; i++) {
         //    unsigned long num = rand();
@@ -84,6 +131,8 @@ int testingFucntion(const char* path, int wSize, int exp, int count, bool type, 
         //    file << "\n";
         //}
         //file.close();
+//        remove(path);
+//        encryptSequence(0, count, 0, path);
         
         
         std::ifstream infile(path);
@@ -110,6 +159,7 @@ int testingFucntion(const char* path, int wSize, int exp, int count, bool type, 
         
         //----------------------------- THIS IS MOVE TO FRONT -----------------------------
         {
+            MoveToFrontList::cnt = 0;
             infile.open(path);
             unsigned long num;
             auto mtf = new MoveToFrontList(wSize, exp);
@@ -156,77 +206,39 @@ int testingFucntion(const char* path, int wSize, int exp, int count, bool type, 
         //}
         
         
-    //}
-    std::cout << "chi: " << chiP / cycles << "\t" << "stackP: " << stackP / cycles << "\t" << "orderedP: " << orderedP / cycles << std::endl;
+    }
+    std::cout << "chi: " << chiP / (cycles) << "\t" << "stackP: " << stackP / (cycles) << "\t" << "orderedP: " << orderedP / (cycles) << std::endl;
     return 0;
 }
 
-void encryptSequence(int from, int to, unsigned long _key, const char* path) {
-	
-	std::ofstream file(path);
-	//auto key = utils::ulongToCharArray(_key);
-	unsigned char key[32] = { 0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef,
-		0x01, 0x12, 0x23, 0x34, 0x45, 0x56, 0x67, 0x78,
-		0x89, 0x9a, 0xab, 0xbc, 0xcd, 0xde, 0xef, 0xf0,
-		0x10, 0x32, 0x54, 0x76, 0x98, 0xba, 0xdc, 0xfe };
-
-	for (int i = from; i < to; i++) {
-		unsigned int ct[4], pt[4];
-		pt[0] = pt[1] = pt[2] = 0x00000000;
-		pt[3] = i;
-		//utils::rc6_key_setup(reinterpret_cast<unsigned char*>(key), 32);
-		utils::rc6_key_setup(key, 32);
-		utils::rc6_block_encrypt(pt, ct);
-		for (int i = 0; i < 4; i++) {
-			file << ct[i] << "\n";
-		}
-		//printf("%08x %08x %08x %08x \n", ct[0], ct[1], ct[2], ct[3]);
-	}
-	
-
-	
+void zalupa(const char* cyka, const char* sobaka) {
+    std::ifstream koza(cyka, std::ios::binary);
+    std::ofstream dereza(sobaka);
+    
+    unsigned int value;
+    
+    while (koza.read(reinterpret_cast<char*>(&value), sizeof(value))) {
+        dereza << value;
+        dereza << "\n";
+    }
 }
 
 
 
 int main(int argc, const char * argv[]) {
-	setlocale(LC_ALL, "Russian");
-    srand(time(NULL));
+//	setlocale(LC_ALL, "Russian");
+//    srand(time(NULL));
     int wSize = 32;
-    int exp = 20;
-	std::size_t count = 1000000;
-    int cycles = 10;
-	const char* path = "C:\\encrypt.txt";
+    int exp = 22;
+//	//std::size_t count = 10000000;
+    std::size_t count = (size_t)pow(2, 22);
+    int cycles = 1;
+//	const char* path = "/Users/Bin/crypt.txt";
+    zalupa("/Users/Bin/res.txt", "/Users/Bin/kakashka.txt");
+    auto var = testingFucntion("/Users/Bin/kakashka.txt", wSize, exp, count, false, cycles);
+    //outDataToBinary(0, (int)pow(2, 22), "/Users/Bin/sobaka");
 
     
-    
-    
-    //auto chars = utils::ulongToChar(1);
-    
-    //std::cout << chars << std::endl;
-    
-	remove(path);
-	encryptSequence(0, (int)pow(2, 18) - 1, 0, path);
-	auto var = testingFucntion(path, wSize, exp, count, false, cycles);
-
-    
-    //unsigned int ct[4], pt[4];
-    //pt[0] = 0x00000000;
-    //pt[1] = 0x00000000;
-    //pt[2] = 0x00000000;
-    //pt[3] = 0x00000001;
-    //auto test = utils::ulongToCharArray(0);
-    //utils::rc6_key_setup(reinterpret_cast<unsigned char*>(test), 32);
-    //utils::rc6_block_encrypt(pt, ct);
-    //printf("%08x %08x %08x %08x \n", ct[0], ct[1], ct[2], ct[3]);
-    //for (int i = 0; i < 4; i++) {
-    //    std::cout << ct[i] << std::endl;
-    //}
-//
-	//file.close();
-    
-	std::cout << "gotovo" << std::endl;
-    //-----------------------------------------------------------------------------------------
-    getchar();
+    //getchar();
 }
 

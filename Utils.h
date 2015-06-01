@@ -18,9 +18,10 @@
  */
 
 namespace utils {
+    
 
 #define w 32    /* word size in bits */
-#define r 30     /* based on security estimates */
+#define r 20    /* based on security estimates */
 
 #define P32 0xB7E15163  /* Magic constants for key setup */
 #define Q32 0x9E3779B9
@@ -153,7 +154,7 @@ struct test_struct
     unsigned char* ulongToCharArray(unsigned long value) {
        
         unsigned char *result = new unsigned char[4];
-        result[0] = value & 0xFF;
+        result[0] = value & 0xFF;  
         result[1] = (value >> 8) & 0xFF;
         result[2] = (value >> 16) & 0xFF;
         result[3] = (value >> 24) & 0xFF;
